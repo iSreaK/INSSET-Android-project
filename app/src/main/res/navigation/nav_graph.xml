@@ -2,7 +2,7 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/loginFragment">
+    app:startDestination="@id/mapFragment">
 
     <fragment
         android:id="@+id/loginFragment"
@@ -14,6 +14,9 @@
         <action
             android:id="@+id/action_loginFragment_to_mapFragment"
             app:destination="@id/mapFragment" />
+        <action
+            android:id="@+id/action_loginFragment_to_accountFragment"
+            app:destination="@id/accountFragment" />
     </fragment>
 
     <fragment
@@ -23,6 +26,9 @@
         <action
             android:id="@+id/action_registerFragment_to_mapFragment"
             app:destination="@id/mapFragment" />
+        <action
+            android:id="@+id/action_registerFragment_to_accountFragment"
+            app:destination="@id/accountFragment" />
     </fragment>
 
     <fragment
@@ -30,11 +36,32 @@
         android:name="com.example.jvbench.ui.map.MapFragment"
         android:label="Map">
         <action
+            android:id="@+id/action_mapFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
+        <action
+            android:id="@+id/action_mapFragment_to_accountFragment"
+            app:destination="@id/accountFragment" />
+        <action
             android:id="@+id/action_mapFragment_to_benchFormFragment"
             app:destination="@id/benchFormFragment" />
         <action
             android:id="@+id/action_mapFragment_to_benchDetailFragment"
             app:destination="@id/benchDetailFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/accountFragment"
+        android:name="com.example.jvbench.ui.account.AccountFragment"
+        android:label="Compte">
+        <action
+            android:id="@+id/action_accountFragment_to_mapFragment"
+            app:destination="@id/mapFragment" />
+        <action
+            android:id="@+id/action_accountFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
+        <action
+            android:id="@+id/action_accountFragment_to_registerFragment"
+            app:destination="@id/registerFragment" />
     </fragment>
 
     <fragment

@@ -27,7 +27,7 @@ public class AppContainer {
 
     public AppContainer(Context context) {
         supabaseClientProvider = new SupabaseClientProvider();
-        supabaseSessionStore = new SupabaseSessionStore();
+        supabaseSessionStore = new SupabaseSessionStore(context);
         supabaseApiClient = new SupabaseApiClient(supabaseClientProvider, supabaseSessionStore);
         authRepository = new SupabaseAuthRepository(supabaseClientProvider, supabaseApiClient, supabaseSessionStore);
         benchRepository = new SupabaseBenchRepository(supabaseClientProvider, supabaseApiClient);

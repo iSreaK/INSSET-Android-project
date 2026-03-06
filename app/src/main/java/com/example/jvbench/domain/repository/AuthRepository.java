@@ -12,4 +12,6 @@ public interface AuthRepository {
     void signOut(ResultCallback<Void> callback);
 
     User getCurrentUser();
+
+    void loadCurrentUser(ResultCallback<User> callback);
 }
