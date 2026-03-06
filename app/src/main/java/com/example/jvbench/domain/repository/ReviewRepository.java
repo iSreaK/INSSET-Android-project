@@ -9,4 +9,8 @@ public interface ReviewRepository {
     void getReviewsForBench(String benchId, ResultCallback<List<Review>> callback);
 
     void addReview(Review review, ResultCallback<Void> callback);
+
+    void updateReview(Review review, ResultCallback<Void> callback);
+
+    void deleteReview(String reviewId, ResultCallback<Void> callback);
 }

@@ -2,6 +2,9 @@ plugins {
     id 'com.android.application'
 }
 
+def supabaseUrl = project.findProperty("SUPABASE_URL") ?: "TODO_SUPABASE_URL"
+def supabaseAnonKey = project.findProperty("SUPABASE_ANON_KEY") ?: "TODO_SUPABASE_ANON_KEY"
+
 android {
     namespace 'com.example.jvbench'
     compileSdk 35
@@ -15,8 +18,8 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
-        buildConfigField "String", "SUPABASE_URL", '"TODO_SUPABASE_URL"'
-        buildConfigField "String", "SUPABASE_ANON_KEY", '"TODO_SUPABASE_ANON_KEY"'
+        buildConfigField "String", "SUPABASE_URL", "\"${supabaseUrl}\""
+        buildConfigField "String", "SUPABASE_ANON_KEY", "\"${supabaseAnonKey}\""
     }
 
     buildTypes {

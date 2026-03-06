@@ -36,14 +36,21 @@ This repository is intentionally a **skeleton**:
 5. BenchDetail -> ReviewForm
 
 ## Supabase setup (later)
-1. Open `app/build.gradle`
-2. Replace:
-- `TODO_SUPABASE_URL`
-- `TODO_SUPABASE_ANON_KEY`
-3. Implement TODO blocks in:
+1. Run SQL script in Supabase SQL Editor:
+- `supabase/jvbench_schema.sql`
+2. Configure Gradle properties (local, do not commit secrets):
+- `SUPABASE_URL=https://<your-project>.supabase.co`
+- `SUPABASE_ANON_KEY=<your-anon-key>`
+3. BuildConfig fields are automatically injected from Gradle properties:
+- `BuildConfig.SUPABASE_URL`
+- `BuildConfig.SUPABASE_ANON_KEY`
+4. Repositories now call Supabase REST/Auth endpoints:
 - `SupabaseAuthRepository`
 - `SupabaseBenchRepository`
 - `SupabaseReviewRepository`
+5. Bucket baseline:
+- `bench-images`
+- object path convention: `<bench_id>/main.<ext>`
 
 No real secret is hardcoded.
 
@@ -58,4 +65,9 @@ No real secret is hardcoded.
 - bench validation, image handling strategy, detail enrichment
 4. Reviews and ratings
 - review creation/listing, aggregate rating updates, moderation rules
-Android project with Kotlin to end a mobility module.
+
+## Backend notes (replaceable by Firebase later)
+- Domain models + repository interfaces are backend-agnostic.
+- Supabase-specific code is isolated in `data/remote/supabase` and `data/repository`.
+- UI and ViewModels only depend on domain repository interfaces.
+- To switch backend later, keep interfaces and replace data implementations.
