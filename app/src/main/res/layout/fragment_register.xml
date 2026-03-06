@@ -26,14 +26,34 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
+        android:hint="@string/username"
+        app:boxBackgroundMode="outline"
+        app:hintTextColor="@color/jv_input_hint">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/registerUsernameInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="text"
+            android:textColor="@color/jv_text_on_dark"
+            android:textColorHint="@color/jv_input_hint" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
         android:hint="@string/email"
-        app:boxBackgroundMode="outline">
+        app:boxBackgroundMode="outline"
+        app:hintTextColor="@color/jv_input_hint">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/registerEmailInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textEmailAddress" />
+            android:inputType="textEmailAddress"
+            android:textColor="@color/jv_text_on_dark"
+            android:textColorHint="@color/jv_input_hint" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -41,13 +61,16 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:hint="@string/password"
-        app:boxBackgroundMode="outline">
+        app:boxBackgroundMode="outline"
+        app:hintTextColor="@color/jv_input_hint">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/registerPasswordInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textPassword" />
+            android:inputType="textPassword"
+            android:textColor="@color/jv_text_on_dark"
+            android:textColorHint="@color/jv_input_hint" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -55,13 +78,16 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:hint="@string/confirm_password"
-        app:boxBackgroundMode="outline">
+        app:boxBackgroundMode="outline"
+        app:hintTextColor="@color/jv_input_hint">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/registerConfirmPasswordInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textPassword" />
+            android:inputType="textPassword"
+            android:textColor="@color/jv_text_on_dark"
+            android:textColorHint="@color/jv_input_hint" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <Button
@@ -70,8 +96,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:backgroundTint="@color/jv_orange"
-        android:textColor="@color/jv_text_on_orange"
-        android:text="@string/sign_up" />
+        android:text="@string/sign_up"
+        android:textColor="@color/jv_text_on_orange" />
 
     <TextView
         android:id="@+id/goLoginText"

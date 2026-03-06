@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -40,7 +41,10 @@ public class AccountFragment extends Fragment {
         View notConnectedBlock = view.findViewById(R.id.accountNotConnectedBlock);
         View connectedBlock = view.findViewById(R.id.accountConnectedBlock);
         TextView emailValue = view.findViewById(R.id.accountEmailValue);
+        TextView usernameValue = view.findViewById(R.id.accountUsernameValue);
         TextView roleValue = view.findViewById(R.id.accountRoleValue);
+        EditText usernameInput = view.findViewById(R.id.accountUsernameInput);
+        Button saveUsernameButton = view.findViewById(R.id.accountSaveUsernameButton);
         Button goLoginButton = view.findViewById(R.id.accountGoLoginButton);
         Button goRegisterButton = view.findViewById(R.id.accountGoRegisterButton);
         Button signOutButton = view.findViewById(R.id.accountSignOutButton);
@@ -65,6 +69,7 @@ public class AccountFragment extends Fragment {
 
         signOutButton.setOnClickListener(v -> {
             signOutButton.setEnabled(false);
+            saveUsernameButton.setEnabled(false);
             viewModel.signOut(new ResultCallback<Void>() {
                 @Override
                 public void onSuccess(Void result) {
@@ -73,6 +78,7 @@ public class AccountFragment extends Fragment {
                     }
                     requireActivity().runOnUiThread(() -> {
                         signOutButton.setEnabled(true);
+                        saveUsernameButton.setEnabled(true);
                         viewModel.loadAccount();
                     });
                 }
@@ -84,10 +90,22 @@ public class AccountFragment extends Fragment {
                     }
                     requireActivity().runOnUiThread(() -> {
                         signOutButton.setEnabled(true);
+                        saveUsernameButton.setEnabled(true);
                         statusText.setText(errorMessage);
                     });
                 }
             });
+        });
+
+        saveUsernameButton.setOnClickListener(v -> {
+            String newUsername = usernameInput.getText().toString().trim();
+            if (!newUsername.matches("^[a-zA-Z0-9_]{3,20}$")) {
+                statusText.setText(R.string.error_invalid_username);
+                return;
+            }
+            saveUsernameButton.setEnabled(false);
+            signOutButton.setEnabled(false);
+            viewModel.updateUsername(newUsername);
         });
 
         viewModel.getUiState().observe(getViewLifecycleOwner(), state -> {
@@ -96,20 +114,26 @@ public class AccountFragment extends Fragment {
             }
             if (state.loading) {
                 statusText.setText(R.string.loading);
+                saveUsernameButton.setEnabled(false);
+                signOutButton.setEnabled(false);
                 connectedBlock.setVisibility(View.GONE);
                 notConnectedBlock.setVisibility(View.GONE);
                 return;
             }
+            saveUsernameButton.setEnabled(true);
+            signOutButton.setEnabled(true);
             if (state.user == null) {
                 statusText.setText(R.string.account_not_connected);
                 connectedBlock.setVisibility(View.GONE);
                 notConnectedBlock.setVisibility(View.VISIBLE);
                 return;
             }
-            statusText.setText(R.string.account_connected);
+            statusText.setText(state.message != null ? state.message : getString(R.string.account_connected));
             notConnectedBlock.setVisibility(View.GONE);
             connectedBlock.setVisibility(View.VISIBLE);
             emailValue.setText(state.user.getEmail());
+            usernameValue.setText(state.user.getUsername());
+            usernameInput.setText(state.user.getUsername());
             roleValue.setText(state.user.getRole().name());
         });
     }

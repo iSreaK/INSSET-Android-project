@@ -13,8 +13,10 @@ public final class UserMapper {
     public static User fromProfileJson(JSONObject json) throws JSONException {
         String id = json.getString("id");
         String email = json.getString("email");
+        String username = json.optString("username", "");
         String roleRaw = json.optString("role", "USER");
+        String createdAt = json.optString("created_at", null);
         UserRole role = "ADMIN".equalsIgnoreCase(roleRaw) ? UserRole.ADMIN : UserRole.USER;
-        return new User(id, email, role);
+        return new User(id, email, username, role, createdAt);
     }
 }

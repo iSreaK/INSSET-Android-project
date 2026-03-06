@@ -27,13 +27,16 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:hint="@string/email"
-        app:boxBackgroundMode="outline">
+        app:boxBackgroundMode="outline"
+        app:hintTextColor="@color/jv_input_hint">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/loginEmailInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textEmailAddress" />
+            android:inputType="textEmailAddress"
+            android:textColor="@color/jv_text_on_dark"
+            android:textColorHint="@color/jv_input_hint" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -41,13 +44,16 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:hint="@string/password"
-        app:boxBackgroundMode="outline">
+        app:boxBackgroundMode="outline"
+        app:hintTextColor="@color/jv_input_hint">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/loginPasswordInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textPassword" />
+            android:inputType="textPassword"
+            android:textColor="@color/jv_text_on_dark"
+            android:textColorHint="@color/jv_input_hint" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <Button

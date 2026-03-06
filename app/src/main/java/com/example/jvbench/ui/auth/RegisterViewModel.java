@@ -35,12 +35,12 @@ public class RegisterViewModel extends ViewModel {
         return uiState;
     }
 
-    public void register(String email, String password, Runnable onSuccess) {
+    public void register(String email, String username, String password, Runnable onSuccess) {
         uiState.postValue(new UiState(Status.LOADING, null));
-        authRepository.signUp(email, password, new com.example.jvbench.core.common.AuthCallback() {
+        authRepository.signUp(email, username, password, new com.example.jvbench.core.common.AuthCallback() {
             @Override
             public void onSuccess(com.example.jvbench.domain.model.User result) {
-                uiState.postValue(new UiState(Status.SUCCESS, "Compte créé avec succès."));
+                uiState.postValue(new UiState(Status.SUCCESS, "Compte cree avec succes."));
                 if (onSuccess != null) {
                     onSuccess.run();
                 }

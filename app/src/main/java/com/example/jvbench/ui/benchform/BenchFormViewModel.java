@@ -40,7 +40,11 @@ public class BenchFormViewModel extends ViewModel {
         uiState.postValue(new UiState(true, null));
 
         User user = authRepository.getCurrentUser();
-        String authorId = user != null ? user.getId() : "anonymous";
+        if (user == null) {
+            uiState.postValue(new UiState(false, "Action reservee aux utilisateurs connectes."));
+            return;
+        }
+        String authorId = user.getId();
 
         Bench bench = new Bench(
                 UUID.randomUUID().toString(),

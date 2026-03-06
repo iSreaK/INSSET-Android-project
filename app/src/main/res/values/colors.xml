@@ -6,4 +6,5 @@
     <color name="jv_text_on_orange">#FFFFFF</color>
     <color name="jv_error_red">#B00020</color>
     <color name="jv_text_on_dark">#FFFFFF</color>
+    <color name="jv_input_hint">#B3FFFFFF</color>
 </resources>

@@ -35,6 +35,7 @@ public class RegisterFragment extends Fragment {
         App app = (App) requireActivity().getApplication();
         viewModel = new ViewModelProvider(this, new AppViewModelFactory(app.getAppContainer())).get(RegisterViewModel.class);
 
+        EditText usernameInput = view.findViewById(R.id.registerUsernameInput);
         EditText emailInput = view.findViewById(R.id.registerEmailInput);
         EditText passwordInput = view.findViewById(R.id.registerPasswordInput);
         EditText confirmPasswordInput = view.findViewById(R.id.registerConfirmPasswordInput);
@@ -60,11 +61,16 @@ public class RegisterFragment extends Fragment {
         });
 
         registerButton.setOnClickListener(v -> {
+            String username = usernameInput.getText().toString().trim();
             String email = emailInput.getText().toString().trim();
             String password = passwordInput.getText().toString();
             String confirmPassword = confirmPasswordInput.getText().toString();
-            if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
-                statusText.setText(R.string.error_missing_credentials);
+            if (TextUtils.isEmpty(username) || TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
+                statusText.setText(R.string.error_missing_register_fields);
+                return;
+            }
+            if (!username.matches("^[a-zA-Z0-9_]{3,20}$")) {
+                statusText.setText(R.string.error_invalid_username);
                 return;
             }
             if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
@@ -79,10 +85,10 @@ public class RegisterFragment extends Fragment {
                 statusText.setText(R.string.error_password_mismatch);
                 return;
             }
-            viewModel.register(email, password, () -> {
+            viewModel.register(email, username, password, () -> {
                 if (isAdded()) {
                     requireActivity().runOnUiThread(() -> NavHostFragment.findNavController(this)
-                            .navigate(R.id.action_registerFragment_to_accountFragment));
+                            .navigate(R.id.action_registerFragment_to_mapFragment));
                 }
             });
         });
