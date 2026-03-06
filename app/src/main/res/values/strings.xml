@@ -1,0 +1,37 @@
+<resources>
+    <string name="app_name">jv-Bench</string>
+
+    <string name="login_title">Login</string>
+    <string name="register_title">Create an account</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="sign_in">Sign in</string>
+    <string name="sign_up">Sign up</string>
+    <string name="go_register">Create account</string>
+    <string name="go_login">Back to login</string>
+
+    <string name="add_bench">Add bench</string>
+    <string name="bench_form_title">New bench</string>
+    <string name="bench_name">Bench name</string>
+    <string name="bench_description">Description</string>
+    <string name="bench_image_url">Image URL</string>
+    <string name="latitude">Latitude</string>
+    <string name="longitude">Longitude</string>
+    <string name="save_bench">Save bench</string>
+    <string name="add_review">Add review</string>
+    <string name="rating_out_of_10">Rating (0-10)</string>
+    <string name="review_comment">Comment</string>
+    <string name="save_review">Save review</string>
+
+    <string name="loading">Loading...</string>
+    <string name="map_ready">Map ready. %1$d bench(es).</string>
+    <string name="coordinates_format">Lat: %1$.5f, Lng: %2$.5f</string>
+    <string name="bench_meta_format">Rating: %1$.1f/10 (%2$d reviews)</string>
+
+    <string name="error_missing_credentials">Email and password are required.</string>
+    <string name="error_missing_bench_fields">Please complete every bench field.</string>
+    <string name="error_invalid_coordinates">Coordinates are invalid.</string>
+    <string name="error_missing_bench_id">Missing bench id.</string>
+    <string name="error_bench_not_found">Bench not found.</string>
+    <string name="error_invalid_rating">Rating must be between 0 and 10.</string>
+</resources>

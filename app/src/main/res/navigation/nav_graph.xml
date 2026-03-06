@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/loginFragment">
+
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.example.jvbench.ui.auth.LoginFragment"
+        android:label="Login">
+        <action
+            android:id="@+id/action_loginFragment_to_registerFragment"
+            app:destination="@id/registerFragment" />
+        <action
+            android:id="@+id/action_loginFragment_to_mapFragment"
+            app:destination="@id/mapFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/registerFragment"
+        android:name="com.example.jvbench.ui.auth.RegisterFragment"
+        android:label="Register">
+        <action
+            android:id="@+id/action_registerFragment_to_mapFragment"
+            app:destination="@id/mapFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/mapFragment"
+        android:name="com.example.jvbench.ui.map.MapFragment"
+        android:label="Map">
+        <action
+            android:id="@+id/action_mapFragment_to_benchFormFragment"
+            app:destination="@id/benchFormFragment" />
+        <action
+            android:id="@+id/action_mapFragment_to_benchDetailFragment"
+            app:destination="@id/benchDetailFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/benchFormFragment"
+        android:name="com.example.jvbench.ui.benchform.BenchFormFragment"
+        android:label="Bench form" />
+
+    <fragment
+        android:id="@+id/benchDetailFragment"
+        android:name="com.example.jvbench.ui.benchdetail.BenchDetailFragment"
+        android:label="Bench detail">
+        <action
+            android:id="@+id/action_benchDetailFragment_to_reviewFormFragment"
+            app:destination="@id/reviewFormFragment" />
+        <argument
+            android:name="benchId"
+            app:argType="string" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/reviewFormFragment"
+        android:name="com.example.jvbench.ui.reviewform.ReviewFormFragment"
+        android:label="Review form">
+        <argument
+            android:name="benchId"
+            app:argType="string" />
+    </fragment>
+</navigation>
