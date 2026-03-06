@@ -37,31 +37,56 @@ public class RegisterFragment extends Fragment {
 
         EditText emailInput = view.findViewById(R.id.registerEmailInput);
         EditText passwordInput = view.findViewById(R.id.registerPasswordInput);
+        EditText confirmPasswordInput = view.findViewById(R.id.registerConfirmPasswordInput);
+        View registerButton = view.findViewById(R.id.registerButton);
+        View goLoginButton = view.findViewById(R.id.goLoginText);
         TextView statusText = view.findViewById(R.id.registerStatusText);
 
         viewModel.getUiState().observe(getViewLifecycleOwner(), state -> {
-            if (state != null && state.message != null) {
-                statusText.setText(state.message);
-            } else if (state != null && state.loading) {
+            if (state == null) {
+                return;
+            }
+            boolean loading = state.status == RegisterViewModel.Status.LOADING;
+            registerButton.setEnabled(!loading);
+            goLoginButton.setEnabled(!loading);
+
+            if (loading) {
                 statusText.setText(R.string.loading);
+            } else if (state.message != null) {
+                statusText.setText(state.message);
+            } else {
+                statusText.setText("");
             }
         });
 
-        view.findViewById(R.id.registerButton).setOnClickListener(v -> {
+        registerButton.setOnClickListener(v -> {
             String email = emailInput.getText().toString().trim();
             String password = passwordInput.getText().toString();
+            String confirmPassword = confirmPasswordInput.getText().toString();
             if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
                 statusText.setText(R.string.error_missing_credentials);
+                return;
+            }
+            if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                statusText.setText(R.string.error_invalid_email);
+                return;
+            }
+            if (password.length() < 6) {
+                statusText.setText(R.string.error_password_too_short);
+                return;
+            }
+            if (!password.equals(confirmPassword)) {
+                statusText.setText(R.string.error_password_mismatch);
                 return;
             }
             viewModel.register(email, password, () -> {
                 if (isAdded()) {
                     requireActivity().runOnUiThread(() -> NavHostFragment.findNavController(this)
-                            .navigate(R.id.action_registerFragment_to_mapFragment));
+                            .navigate(R.id.action_registerFragment_to_accountFragment));
                 }
             });
         });
 
-        view.findViewById(R.id.goLoginText).setOnClickListener(v -> NavHostFragment.findNavController(this).navigateUp());
+        goLoginButton.setOnClickListener(v -> NavHostFragment.findNavController(this).navigateUp());
     }
 }

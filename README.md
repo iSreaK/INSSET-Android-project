@@ -1,61 +1,69 @@
 # jv-Bench Android (Java)
 
-jv-Bench is a collaborative Android app to geolocate public benches, view bench details, and later add reviews/ratings/comments.
+Application Android pour localiser des bancs, consulter leurs details, puis ajouter des avis.
 
-This repository is intentionally a **skeleton**:
-- architecture and navigation are ready
-- main entities are modeled
-- Supabase integration points are prepared
-- business features remain TODO for team implementation
+## Etat actuel
+- Projet en Java (pas Kotlin).
+- Build debug fonctionnel.
+- Navigation principale en place:
+  - Carte (ecran d'accueil)
+  - Compte (navbar basse)
+- Auth Supabase operationnelle:
+  - login / register
+  - session simple
+  - page compte conditionnelle (connecte vs non connecte)
+- UI de base en francais + theme couleur + logo app.
 
-## Stack
+## Stack technique
 - Java
-- XML + Fragments
-- MVVM (simple, pedagogical)
-- Navigation Component (single Activity)
+- Fragments + XML
+- Architecture MVVM simple
+- Navigation Component (single activity)
 - OpenStreetMap via osmdroid
-- Supabase-ready repository layer (manual DI, no Hilt)
+- Supabase REST/Auth
+- DI manuelle (`AppContainer`)
 
-## Architecture
-- `com.example.jvbench.di`: `App`, `AppContainer`
-- `com.example.jvbench.core`: callbacks, location, permissions, navigation constants
-- `com.example.jvbench.domain`: models (`Bench`, `Review`, `User`, `UserRole`, `GeoPoint`) + repository contracts
-- `com.example.jvbench.data`: Supabase provider + repository skeletons + mapper placeholder
-- `com.example.jvbench.ui`: `auth`, `map`, `benchform`, `benchdetail`, `reviewform`, `main`
+## Structure
+- `app/src/main/java/com/example/jvbench/ui`: ecrans (auth, map, account, bench, review)
+- `app/src/main/java/com/example/jvbench/domain`: modeles + interfaces repositories
+- `app/src/main/java/com/example/jvbench/data`: impl repositories + remote Supabase
+- `app/src/main/java/com/example/jvbench/di`: bootstrap applicatif
+- `supabase/jvbench_schema.sql`: schema SQL de reference
 
-## Already prepared
-- Login/Register screens and ViewModels
-- Map screen with osmdroid map initialization
-- Bench form/detail screens and ViewModels
-- Review form screen and ViewModel
-- Navigation flow:
-1. Login -> Register
-2. Login -> Map
-3. Map -> BenchForm
-4. Map -> BenchDetail
-5. BenchDetail -> ReviewForm
+## Lancer le projet (terminal)
+1. Se placer a la racine projet:
+   - `cd Android/Projet/INSSET-Android-project`
+2. Compiler:
+   - `gradle assembleDebug`
+3. Installer sur device/emulateur connecte:
+   - `gradle installDebug`
 
-## Supabase setup (later)
-1. Open `app/build.gradle`
-2. Replace:
-- `TODO_SUPABASE_URL`
-- `TODO_SUPABASE_ANON_KEY`
-3. Implement TODO blocks in:
-- `SupabaseAuthRepository`
-- `SupabaseBenchRepository`
-- `SupabaseReviewRepository`
+## Configuration Supabase
+Configurer `gradle.properties` (racine projet):
+- `SUPABASE_URL=...`
+- `SUPABASE_ANON_KEY=...`
 
-No real secret is hardcoded.
+Important:
+- Ne pas desactiver le provider Email si vous utilisez login/register par email.
+- Si confirmation email active, utiliser une vraie boite mail de test.
 
-## Team TODO split (4 members suggestion)
-1. Auth and session flow
-- finalize Supabase auth calls
-- improve auth error handling
-2. Map and bench markers
-- bench marker rendering strategy
-- map interactions and filtering
-3. Bench creation and detail
-- bench validation, image handling strategy, detail enrichment
-4. Reviews and ratings
-- review creation/listing, aggregate rating updates, moderation rules
-Android project with Kotlin to end a mobility module.
+## Work in Progress
+1. Carte metier
+- interactions map avancees
+- filtres/recherche
+
+2. Bancs (coeur produit)
+- CRUD complet
+- gestion image propre (upload/affichage/erreurs)
+
+3. Avis et details
+- flux avis/notes complet
+- enrichissement detail banc
+
+4. Securite et robustesse
+- RLS/policies Supabase a verrouiller
+- tests minimaux (auth/navigation/repositories)
+- reduction des warnings outillage Gradle/AGP
+
+## Notes
+- Ce repo reste evolutif: certaines parties sont deja utilisables, d'autres sont encore en implementation.

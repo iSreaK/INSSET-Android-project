@@ -38,32 +38,54 @@ public class LoginFragment extends Fragment {
 
         EditText emailInput = view.findViewById(R.id.loginEmailInput);
         EditText passwordInput = view.findViewById(R.id.loginPasswordInput);
+        Button loginButton = view.findViewById(R.id.loginButton);
+        Button goRegisterButton = view.findViewById(R.id.goRegisterButton);
         TextView statusText = view.findViewById(R.id.loginStatusText);
 
         viewModel.getUiState().observe(getViewLifecycleOwner(), state -> {
-            if (state != null && state.message != null) {
-                statusText.setText(state.message);
-            } else if (state != null && state.loading) {
+            if (state == null) {
+                return;
+            }
+            boolean loading = state.status == LoginViewModel.Status.LOADING;
+            loginButton.setEnabled(!loading);
+            goRegisterButton.setEnabled(!loading);
+
+            if (loading) {
                 statusText.setText(R.string.loading);
+            } else if (state.message != null) {
+                statusText.setText(state.message);
+            } else {
+                statusText.setText("");
             }
         });
 
-        view.findViewById(R.id.loginButton).setOnClickListener(v -> {
+        loginButton.setOnClickListener(v -> {
             String email = emailInput.getText().toString().trim();
             String password = passwordInput.getText().toString();
             if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
                 statusText.setText(R.string.error_missing_credentials);
                 return;
             }
+            if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                statusText.setText(R.string.error_invalid_email);
+                return;
+            }
             viewModel.login(email, password, () -> {
                 if (isAdded()) {
                     requireActivity().runOnUiThread(() -> NavHostFragment.findNavController(this)
-                            .navigate(R.id.action_loginFragment_to_mapFragment));
+                            .navigate(R.id.action_loginFragment_to_accountFragment));
                 }
             });
         });
 
-        view.findViewById(R.id.goRegisterButton).setOnClickListener(v ->
+        goRegisterButton.setOnClickListener(v ->
                 NavHostFragment.findNavController(this).navigate(R.id.action_loginFragment_to_registerFragment));
+
+        viewModel.restoreSession(() -> {
+            if (isAdded()) {
+                requireActivity().runOnUiThread(() -> NavHostFragment.findNavController(this)
+                        .navigate(R.id.action_loginFragment_to_accountFragment));
+            }
+        });
     }
 }

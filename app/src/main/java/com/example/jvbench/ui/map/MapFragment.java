@@ -17,6 +17,7 @@ import com.example.jvbench.core.navigation.NavConstants;
 import com.example.jvbench.di.App;
 import com.example.jvbench.domain.model.Bench;
 import com.example.jvbench.ui.main.AppViewModelFactory;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
@@ -51,6 +52,19 @@ public class MapFragment extends Fragment {
 
         view.findViewById(R.id.goBenchFormButton).setOnClickListener(v ->
                 NavHostFragment.findNavController(this).navigate(R.id.action_mapFragment_to_benchFormFragment));
+
+        BottomNavigationView bottomNavigationView = view.findViewById(R.id.mapBottomNav);
+        bottomNavigationView.setSelectedItemId(R.id.navMapItem);
+        bottomNavigationView.setOnItemSelectedListener(item -> {
+            if (item.getItemId() == R.id.navMapItem) {
+                return true;
+            }
+            if (item.getItemId() == R.id.navAccountItem) {
+                NavHostFragment.findNavController(this).navigate(R.id.action_mapFragment_to_accountFragment);
+                return true;
+            }
+            return false;
+        });
 
         viewModel.getUiState().observe(getViewLifecycleOwner(), state -> {
             if (state == null) {

@@ -1,0 +1,124 @@
+package com.example.jvbench.ui.account;
+
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.fragment.NavHostFragment;
+
+import com.example.jvbench.R;
+import com.example.jvbench.core.common.ResultCallback;
+import com.example.jvbench.di.App;
+import com.example.jvbench.ui.main.AppViewModelFactory;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+public class AccountFragment extends Fragment {
+    private AccountViewModel viewModel;
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_account, container, false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        App app = (App) requireActivity().getApplication();
+        viewModel = new ViewModelProvider(this, new AppViewModelFactory(app.getAppContainer())).get(AccountViewModel.class);
+
+        TextView statusText = view.findViewById(R.id.accountStatusText);
+        View notConnectedBlock = view.findViewById(R.id.accountNotConnectedBlock);
+        View connectedBlock = view.findViewById(R.id.accountConnectedBlock);
+        TextView emailValue = view.findViewById(R.id.accountEmailValue);
+        TextView roleValue = view.findViewById(R.id.accountRoleValue);
+        Button goLoginButton = view.findViewById(R.id.accountGoLoginButton);
+        Button goRegisterButton = view.findViewById(R.id.accountGoRegisterButton);
+        Button signOutButton = view.findViewById(R.id.accountSignOutButton);
+
+        BottomNavigationView bottomNavigationView = view.findViewById(R.id.accountBottomNav);
+        bottomNavigationView.setSelectedItemId(R.id.navAccountItem);
+        bottomNavigationView.setOnItemSelectedListener(item -> {
+            if (item.getItemId() == R.id.navAccountItem) {
+                return true;
+            }
+            if (item.getItemId() == R.id.navMapItem) {
+                NavHostFragment.findNavController(this).navigate(R.id.action_accountFragment_to_mapFragment);
+                return true;
+            }
+            return false;
+        });
+
+        goLoginButton.setOnClickListener(v ->
+                NavHostFragment.findNavController(this).navigate(R.id.action_accountFragment_to_loginFragment));
+        goRegisterButton.setOnClickListener(v ->
+                NavHostFragment.findNavController(this).navigate(R.id.action_accountFragment_to_registerFragment));
+
+        signOutButton.setOnClickListener(v -> {
+            signOutButton.setEnabled(false);
+            viewModel.signOut(new ResultCallback<Void>() {
+                @Override
+                public void onSuccess(Void result) {
+                    if (!isAdded()) {
+                        return;
+                    }
+                    requireActivity().runOnUiThread(() -> {
+                        signOutButton.setEnabled(true);
+                        viewModel.loadAccount();
+                    });
+                }
+
+                @Override
+                public void onError(String errorMessage) {
+                    if (!isAdded()) {
+                        return;
+                    }
+                    requireActivity().runOnUiThread(() -> {
+                        signOutButton.setEnabled(true);
+                        statusText.setText(errorMessage);
+                    });
+                }
+            });
+        });
+
+        viewModel.getUiState().observe(getViewLifecycleOwner(), state -> {
+            if (state == null) {
+                return;
+            }
+            if (state.loading) {
+                statusText.setText(R.string.loading);
+                connectedBlock.setVisibility(View.GONE);
+                notConnectedBlock.setVisibility(View.GONE);
+                return;
+            }
+            if (state.user == null) {
+                statusText.setText(R.string.account_not_connected);
+                connectedBlock.setVisibility(View.GONE);
+                notConnectedBlock.setVisibility(View.VISIBLE);
+                return;
+            }
+            statusText.setText(R.string.account_connected);
+            notConnectedBlock.setVisibility(View.GONE);
+            connectedBlock.setVisibility(View.VISIBLE);
+            emailValue.setText(state.user.getEmail());
+            roleValue.setText(state.user.getRole().name());
+        });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (viewModel != null) {
+            viewModel.loadAccount();
+        }
+    }
+}

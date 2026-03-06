@@ -11,4 +11,8 @@ public interface BenchRepository {
     void getBenchById(String id, ResultCallback<Bench> callback);
 
     void createBench(Bench bench, ResultCallback<Void> callback);
+
+    void updateBench(Bench bench, ResultCallback<Void> callback);
+
+    void deleteBench(String benchId, ResultCallback<Void> callback);
 }

@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.jvbench.di.AppContainer;
 import com.example.jvbench.ui.auth.LoginViewModel;
 import com.example.jvbench.ui.auth.RegisterViewModel;
+import com.example.jvbench.ui.account.AccountViewModel;
 import com.example.jvbench.ui.benchdetail.BenchDetailViewModel;
 import com.example.jvbench.ui.benchform.BenchFormViewModel;
 import com.example.jvbench.ui.map.MapViewModel;
@@ -28,6 +29,9 @@ public class AppViewModelFactory implements ViewModelProvider.Factory {
         }
         if (modelClass.isAssignableFrom(RegisterViewModel.class)) {
             return (T) new RegisterViewModel(container.authRepository);
+        }
+        if (modelClass.isAssignableFrom(AccountViewModel.class)) {
+            return (T) new AccountViewModel(container.authRepository);
         }
         if (modelClass.isAssignableFrom(MapViewModel.class)) {
             return (T) new MapViewModel(container.benchRepository, container.locationProvider);
