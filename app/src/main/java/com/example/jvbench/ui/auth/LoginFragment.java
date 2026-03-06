@@ -73,7 +73,7 @@ public class LoginFragment extends Fragment {
             viewModel.login(email, password, () -> {
                 if (isAdded()) {
                     requireActivity().runOnUiThread(() -> NavHostFragment.findNavController(this)
-                            .navigate(R.id.action_loginFragment_to_accountFragment));
+                            .navigate(R.id.action_loginFragment_to_mapFragment));
                 }
             });
         });
@@ -84,7 +84,7 @@ public class LoginFragment extends Fragment {
         viewModel.restoreSession(() -> {
             if (isAdded()) {
                 requireActivity().runOnUiThread(() -> NavHostFragment.findNavController(this)
-                        .navigate(R.id.action_loginFragment_to_accountFragment));
+                        .navigate(R.id.action_loginFragment_to_mapFragment));
             }
         });
     }

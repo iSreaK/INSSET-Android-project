@@ -50,4 +50,20 @@ public class AccountViewModel extends ViewModel {
     public void signOut(ResultCallback<Void> callback) {
         authRepository.signOut(callback);
     }
+
+    public void updateUsername(String username) {
+        UiState current = uiState.getValue();
+        uiState.postValue(new UiState(true, current != null ? current.user : null, null));
+        authRepository.updateUsername(username, new ResultCallback<User>() {
+            @Override
+            public void onSuccess(User result) {
+                uiState.postValue(new UiState(false, result, "Username mis a jour."));
+            }
+
+            @Override
+            public void onError(String errorMessage) {
+                uiState.postValue(new UiState(false, current != null ? current.user : null, errorMessage));
+            }
+        });
+    }
 }

@@ -1,106 +1,217 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="@color/jv_light_gray"
+    android:orientation="vertical"
     android:padding="16dp">
 
     <TextView
         android:id="@+id/accountStatusText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
         android:text="@string/loading"
         android:textColor="@color/jv_text_on_dark"
-        android:textSize="16sp"
+        android:textSize="15sp"
         android:textStyle="bold" />
 
-    <LinearLayout
-        android:id="@+id/accountNotConnectedBlock"
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:visibility="gone">
+        android:fillViewport="true">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            android:text="@string/account_not_connected_hint"
-            android:textColor="@color/jv_text_on_dark"
-            android:textSize="16sp" />
-
-        <Button
-            android:id="@+id/accountGoLoginButton"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:backgroundTint="@color/jv_orange"
-            android:text="@string/sign_in"
-            android:textColor="@color/jv_text_on_orange" />
+            android:orientation="vertical">
 
-        <Button
-            android:id="@+id/accountGoRegisterButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/sign_up" />
-    </LinearLayout>
+            <LinearLayout
+                android:id="@+id/accountNotConnectedBlock"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:visibility="gone">
 
-    <LinearLayout
-        android:id="@+id/accountConnectedBlock"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:orientation="vertical"
-        android:visibility="gone">
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardBackgroundColor="#15203E"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="2dp">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="@string/account_email_label"
-            android:textColor="@color/jv_text_on_dark"
-            android:textSize="14sp" />
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
 
-        <TextView
-            android:id="@+id/accountEmailValue"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:textColor="@android:color/white"
-            android:textSize="16sp"
-            android:textStyle="bold" />
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="12dp"
+                            android:text="@string/account_not_connected_hint"
+                            android:textColor="@color/jv_text_on_dark"
+                            android:textSize="16sp" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/account_role_label"
-            android:textColor="@color/jv_text_on_dark"
-            android:textSize="14sp" />
+                        <Button
+                            android:id="@+id/accountGoLoginButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="8dp"
+                            android:backgroundTint="@color/jv_orange"
+                            android:text="@string/sign_in"
+                            android:textColor="@color/jv_text_on_orange" />
 
-        <TextView
-            android:id="@+id/accountRoleValue"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
-            android:textColor="@android:color/white"
-            android:textSize="16sp"
-            android:textStyle="bold" />
+                        <Button
+                            android:id="@+id/accountGoRegisterButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:backgroundTint="@android:color/white"
+                            android:text="@string/sign_up"
+                            android:textColor="@color/jv_dark_blue" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
 
-        <Button
-            android:id="@+id/accountSignOutButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/sign_out" />
-    </LinearLayout>
+            <LinearLayout
+                android:id="@+id/accountConnectedBlock"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardBackgroundColor="#15203E"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="2dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/account_email_label"
+                            android:textColor="@color/jv_input_hint"
+                            android:textSize="13sp" />
+
+                        <TextView
+                            android:id="@+id/accountEmailValue"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="12dp"
+                            android:textColor="@color/jv_text_on_dark"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/account_username_label"
+                            android:textColor="@color/jv_input_hint"
+                            android:textSize="13sp" />
+
+                        <TextView
+                            android:id="@+id/accountUsernameValue"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="12dp"
+                            android:textColor="@color/jv_text_on_dark"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/account_role_label"
+                            android:textColor="@color/jv_input_hint"
+                            android:textSize="13sp" />
+
+                        <TextView
+                            android:id="@+id/accountRoleValue"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/jv_text_on_dark"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    app:cardBackgroundColor="#15203E"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="2dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="8dp"
+                            android:text="@string/account_edit_username"
+                            android:textColor="@color/jv_text_on_dark"
+                            android:textStyle="bold" />
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/username"
+                            app:boxBackgroundMode="outline"
+                            app:hintTextColor="@color/jv_input_hint">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/accountUsernameInput"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="text"
+                                android:textColor="@color/jv_text_on_dark"
+                                android:textColorHint="@color/jv_input_hint" />
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <Button
+                            android:id="@+id/accountSaveUsernameButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:backgroundTint="@color/jv_orange"
+                            android:text="@string/account_save_username"
+                            android:textColor="@color/jv_text_on_orange" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <Button
+                    android:id="@+id/accountSignOutButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:backgroundTint="@android:color/white"
+                    android:text="@string/sign_out"
+                    android:textColor="@color/jv_dark_blue" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/accountBottomNav"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
         android:background="@color/jv_dark_blue"
         app:itemIconTint="@android:color/white"
         app:itemTextColor="@android:color/white"

@@ -16,6 +16,7 @@ import com.example.jvbench.R;
 import com.example.jvbench.core.navigation.NavConstants;
 import com.example.jvbench.di.App;
 import com.example.jvbench.domain.model.Bench;
+import com.example.jvbench.domain.model.User;
 import com.example.jvbench.ui.main.AppViewModelFactory;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -50,7 +51,11 @@ public class MapFragment extends Fragment {
         mapView.getController().setCenter(new org.osmdroid.util.GeoPoint(49.8941, 2.2958));
         mapView.setMultiTouchControls(true);
 
-        view.findViewById(R.id.goBenchFormButton).setOnClickListener(v ->
+        View addBenchButton = view.findViewById(R.id.goBenchFormButton);
+        User currentUser = app.getAppContainer().authRepository.getCurrentUser();
+        addBenchButton.setVisibility(currentUser == null ? View.GONE : View.VISIBLE);
+
+        addBenchButton.setOnClickListener(v ->
                 NavHostFragment.findNavController(this).navigate(R.id.action_mapFragment_to_benchFormFragment));
 
         BottomNavigationView bottomNavigationView = view.findViewById(R.id.mapBottomNav);

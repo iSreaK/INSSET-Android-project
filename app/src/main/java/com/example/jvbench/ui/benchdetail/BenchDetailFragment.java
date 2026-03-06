@@ -16,6 +16,7 @@ import com.example.jvbench.R;
 import com.example.jvbench.core.navigation.NavConstants;
 import com.example.jvbench.di.App;
 import com.example.jvbench.domain.model.Bench;
+import com.example.jvbench.domain.model.User;
 import com.example.jvbench.ui.main.AppViewModelFactory;
 
 public class BenchDetailFragment extends Fragment {
@@ -37,6 +38,10 @@ public class BenchDetailFragment extends Fragment {
         TextView descriptionText = view.findViewById(R.id.benchDetailDescriptionText);
         TextView coordinatesText = view.findViewById(R.id.benchDetailCoordinatesText);
         TextView metaText = view.findViewById(R.id.benchDetailMetaText);
+        View addReviewButton = view.findViewById(R.id.goReviewFormButton);
+
+        User currentUser = app.getAppContainer().authRepository.getCurrentUser();
+        addReviewButton.setVisibility(currentUser == null ? View.GONE : View.VISIBLE);
 
         String benchId = getArguments() != null ? getArguments().getString(NavConstants.ARG_BENCH_ID) : null;
         if (benchId == null || benchId.isBlank()) {
@@ -44,7 +49,7 @@ public class BenchDetailFragment extends Fragment {
             return;
         }
 
-        view.findViewById(R.id.goReviewFormButton).setOnClickListener(v -> {
+        addReviewButton.setOnClickListener(v -> {
             Bundle args = new Bundle();
             args.putString(NavConstants.ARG_BENCH_ID, benchId);
             NavHostFragment.findNavController(this).navigate(R.id.action_benchDetailFragment_to_reviewFormFragment, args);

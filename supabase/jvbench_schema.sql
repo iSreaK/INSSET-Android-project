@@ -6,9 +6,19 @@ create extension if not exists pgcrypto;
 create table if not exists public.profiles (
     id uuid primary key references auth.users (id) on delete cascade,
     email text not null unique,
+    username text not null,
     role text not null default 'USER' check (role in ('USER', 'ADMIN')),
     created_at timestamptz not null default now()
 );
+
+-- Migration-safe additions for existing projects.
+alter table public.profiles add column if not exists username text;
+update public.profiles
+set username = split_part(email, '@', 1)
+where username is null or btrim(username) = '';
+alter table public.profiles alter column username set not null;
+
+create unique index if not exists idx_profiles_username_lower_unique on public.profiles ((lower(username)));
 
 create table if not exists public.benches (
     id uuid primary key default gen_random_uuid(),
@@ -97,7 +107,13 @@ drop policy if exists "profiles_update_self_or_admin" on public.profiles;
 create policy "profiles_update_self_or_admin"
 on public.profiles for update
 using (auth.uid() = id or public.is_admin())
-with check (auth.uid() = id or public.is_admin());
+with check (
+    public.is_admin()
+    or (
+        auth.uid() = id
+        and role = (select p.role from public.profiles p where p.id = auth.uid())
+    )
+);
 
 -- BENCHES
 drop policy if exists "benches_read_all" on public.benches;

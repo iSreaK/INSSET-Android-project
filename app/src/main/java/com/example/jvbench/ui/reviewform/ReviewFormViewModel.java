@@ -39,7 +39,11 @@ public class ReviewFormViewModel extends ViewModel {
         uiState.postValue(new UiState(true, null));
 
         User user = authRepository.getCurrentUser();
-        String userId = user != null ? user.getId() : "anonymous";
+        if (user == null) {
+            uiState.postValue(new UiState(false, "Action reservee aux utilisateurs connectes."));
+            return;
+        }
+        String userId = user.getId();
 
         Review review = new Review(
                 UUID.randomUUID().toString(),
