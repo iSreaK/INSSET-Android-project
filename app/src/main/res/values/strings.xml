@@ -86,6 +86,18 @@
     <string name="map_long_press_hint">Maintiens un appui sur la carte pour ajouter un banc.</string>
     <string name="offline_banner">Hors ligne — certaines actions sont indisponibles.</string>
     <string name="offline_action_blocked">Action indisponible hors ligne.</string>
+    <string name="nearby_title">Bancs autour de vous</string>
+    <string name="nearby_radius_label">Rayon de recherche : %1$d m</string>
+    <string name="nearby_empty">Aucun banc dans ce rayon.</string>
+    <string name="nearby_no_fix">Position inconnue. Active la localisation pour voir les bancs autour.</string>
+    <string name="nearby_distance_meters">À %1$d m</string>
+    <string name="nearby_distance_kilometers">À %1$.1f km</string>
+    <string name="nearby_navigate">S y rendre</string>
+    <string name="nearby_open">Voir le banc</string>
+    <string name="error_no_navigation_app">Aucune application de navigation installee.</string>
+    <string name="nearby_button_label">Autour de vous</string>
+    <string name="nearby_button_disabled_offline">Hors ligne — recherche indisponible.</string>
+    <string name="nearby_button_disabled_no_perm">Active la localisation pour rechercher autour de toi.</string>
 
     <string name="reviews_section_title">Avis</string>
     <string name="reviews_empty">Aucun avis pour le moment.</string>

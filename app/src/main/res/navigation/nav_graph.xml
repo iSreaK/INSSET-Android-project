@@ -53,6 +53,9 @@
         <action
             android:id="@+id/action_mapFragment_to_adminFragment"
             app:destination="@id/adminFragment" />
+        <action
+            android:id="@+id/action_mapFragment_to_nearbyBenchesFragment"
+            app:destination="@id/nearbyBenchesFragment" />
     </fragment>
 
     <fragment
@@ -159,5 +162,14 @@
         <argument
             android:name="benchId"
             app:argType="string" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nearbyBenchesFragment"
+        android:name="com.example.jvbench.ui.nearby.NearbyBenchesFragment"
+        android:label="Bancs autour de vous">
+        <action
+            android:id="@+id/action_nearbyBenchesFragment_to_benchDetailFragment"
+            app:destination="@id/benchDetailFragment" />
     </fragment>
 </navigation>

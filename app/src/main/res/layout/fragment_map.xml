@@ -51,6 +51,18 @@
             android:scaleType="fitCenter"
             android:src="@drawable/ic_compass" />
 
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/nearbyFab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|end"
+            android:layout_marginTop="72dp"
+            android:layout_marginEnd="16dp"
+            android:contentDescription="@string/nearby_button_label"
+            android:src="@drawable/ic_nearby"
+            app:backgroundTint="@color/jv_orange"
+            app:tint="@color/jv_text_on_orange" />
+
         <Button
             android:id="@+id/goBenchFormButton"
             android:layout_width="match_parent"

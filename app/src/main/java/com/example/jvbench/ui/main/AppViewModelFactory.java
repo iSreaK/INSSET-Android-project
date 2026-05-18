@@ -13,6 +13,7 @@ import com.example.jvbench.ui.benchform.BenchFormViewModel;
 import com.example.jvbench.ui.map.MapViewModel;
 import com.example.jvbench.ui.admin.AdminViewModel;
 import com.example.jvbench.ui.mybenches.MyBenchesViewModel;
+import com.example.jvbench.ui.nearby.NearbyBenchesViewModel;
 import com.example.jvbench.ui.reviewform.ReviewFormViewModel;
 
 public class AppViewModelFactory implements ViewModelProvider.Factory {
@@ -52,6 +53,9 @@ public class AppViewModelFactory implements ViewModelProvider.Factory {
         }
         if (modelClass.isAssignableFrom(AdminViewModel.class)) {
             return (T) new AdminViewModel(container.adminRepository);
+        }
+        if (modelClass.isAssignableFrom(NearbyBenchesViewModel.class)) {
+            return (T) new NearbyBenchesViewModel(container.benchRepository, container.locationProvider);
         }
         throw new IllegalArgumentException("Unknown ViewModel class: " + modelClass.getName());
     }
