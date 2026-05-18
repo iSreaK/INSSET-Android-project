@@ -9,7 +9,6 @@ import com.example.jvbench.domain.model.User;
 import com.example.jvbench.domain.repository.AuthRepository;
 import com.example.jvbench.domain.repository.BenchRepository;
 
-import java.util.UUID;
 
 public class BenchFormViewModel extends ViewModel {
     public static class UiState {
@@ -47,7 +46,7 @@ public class BenchFormViewModel extends ViewModel {
         String authorId = user.getId();
 
         Bench bench = new Bench(
-                UUID.randomUUID().toString(),
+                null,
                 name,
                 description,
                 latitude,

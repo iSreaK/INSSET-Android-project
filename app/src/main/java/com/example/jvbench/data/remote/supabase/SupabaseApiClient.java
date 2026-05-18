@@ -44,6 +44,49 @@ public class SupabaseApiClient {
         return execute("PATCH", absoluteUrl, payload, requiresAuth, preferHeader);
     }
 
+    public SupabaseResponse uploadImage(String absoluteUrl, byte[] imageData, String mimeType) {
+        if (!provider.isConfigured()) {
+            return SupabaseResponse.failure(0, null, "Supabase is not configured.");
+        }
+        if (!sessionStore.isAuthenticated()) {
+            return SupabaseResponse.failure(401, null, "User is not authenticated.");
+        }
+        String resolvedMime = (mimeType != null && !mimeType.isBlank()) ? mimeType : "image/jpeg";
+        RequestBody body = RequestBody.create(imageData, MediaType.parse(resolvedMime));
+
+        Request.Builder builder = new Request.Builder()
+                .url(absoluteUrl)
+                .post(body)
+                .addHeader("apikey", provider.getAnonKey())
+                .addHeader("Authorization", "Bearer " + sessionStore.getAccessToken())
+                .addHeader("x-upsert", "false");
+
+        try (Response response = provider.getHttpClient().newCall(builder.build()).execute()) {
+            String responseBody = response.body() != null ? response.body().string() : "";
+            if (response.isSuccessful()) {
+                return SupabaseResponse.success(response.code(), responseBody);
+            }
+            // Token expiré → refresh et retry une fois
+            if (isExpiredTokenError(response.code(), responseBody) && tryRefreshSession()) {
+                builder.header("Authorization", "Bearer " + sessionStore.getAccessToken());
+                try (Response retried = provider.getHttpClient().newCall(builder.build()).execute()) {
+                    String retriedBody = retried.body() != null ? retried.body().string() : "";
+                    if (retried.isSuccessful()) {
+                        return SupabaseResponse.success(retried.code(), retriedBody);
+                    }
+                    String err = !retriedBody.isBlank() ? retriedBody : "Upload failed: " + retried.code();
+                    return SupabaseResponse.failure(retried.code(), retriedBody, err);
+                }
+            }
+            String error = (responseBody != null && !responseBody.isBlank())
+                    ? responseBody
+                    : "Upload failed: " + response.code();
+            return SupabaseResponse.failure(response.code(), responseBody, error);
+        } catch (IOException exception) {
+            return SupabaseResponse.failure(0, null, exception.getMessage());
+        }
+    }
+
     private SupabaseResponse execute(
             String method,
             String absoluteUrl,
@@ -74,18 +117,10 @@ public class SupabaseApiClient {
                 : RequestBody.create(payload.toString(), JSON_MEDIA_TYPE);
 
         switch (method) {
-            case "GET":
-                builder.get();
-                break;
-            case "POST":
-                builder.post(body);
-                break;
-            case "PATCH":
-                builder.patch(body);
-                break;
-            case "DELETE":
-                builder.delete();
-                break;
+            case "GET": builder.get(); break;
+            case "POST": builder.post(body); break;
+            case "PATCH": builder.patch(body); break;
+            case "DELETE": builder.delete(); break;
             default:
                 return SupabaseResponse.failure(0, null, "Unsupported HTTP method: " + method);
         }
@@ -95,12 +130,54 @@ public class SupabaseApiClient {
             if (response.isSuccessful()) {
                 return SupabaseResponse.success(response.code(), responseBody);
             }
+            // Token expiré → refresh et retry une fois
+            if (requiresAuth && isExpiredTokenError(response.code(), responseBody) && tryRefreshSession()) {
+                builder.header("Authorization", "Bearer " + sessionStore.getAccessToken());
+                try (Response retried = provider.getHttpClient().newCall(builder.build()).execute()) {
+                    String retriedBody = retried.body() != null ? retried.body().string() : "";
+                    if (retried.isSuccessful()) {
+                        return SupabaseResponse.success(retried.code(), retriedBody);
+                    }
+                    String err = !retriedBody.isBlank() ? retriedBody : "Supabase error code " + retried.code();
+                    return SupabaseResponse.failure(retried.code(), retriedBody, err);
+                }
+            }
             String error = responseBody != null && !responseBody.isBlank()
                     ? responseBody
                     : "Supabase error code " + response.code();
             return SupabaseResponse.failure(response.code(), responseBody, error);
         } catch (IOException exception) {
             return SupabaseResponse.failure(0, null, exception.getMessage());
+        }
+    }
+
+    private boolean isExpiredTokenError(int code, String body) {
+        return (code == 401 || code == 403) && body != null && body.contains("exp");
+    }
+
+    private boolean tryRefreshSession() {
+        String refreshToken = sessionStore.getRefreshToken();
+        if (refreshToken == null || refreshToken.isBlank()) return false;
+        try {
+            JSONObject payload = new JSONObject().put("refresh_token", refreshToken);
+            Request request = new Request.Builder()
+                    .url(provider.getAuthBaseUrl() + "/token?grant_type=refresh_token")
+                    .post(RequestBody.create(payload.toString(), JSON_MEDIA_TYPE))
+                    .addHeader("apikey", provider.getAnonKey())
+                    .addHeader("Content-Type", "application/json")
+                    .build();
+            try (Response response = provider.getHttpClient().newCall(request).execute()) {
+                if (!response.isSuccessful()) return false;
+                String body = response.body() != null ? response.body().string() : "";
+                JSONObject json = new JSONObject(body);
+                String newAccessToken = json.getString("access_token");
+                String newRefreshToken = json.optString("refresh_token", refreshToken);
+                sessionStore.saveSession(newAccessToken, sessionStore.getUserId(),
+                        sessionStore.getUserEmail(), newRefreshToken);
+                return true;
+            }
+        } catch (Exception e) {
+            return false;
         }
     }
 }

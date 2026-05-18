@@ -15,6 +15,7 @@ public final class ReviewMapper {
         dto.id = json.getString("id");
         dto.benchId = json.getString("bench_id");
         dto.userId = json.getString("user_id");
+        dto.username = "Utilisateur";
         dto.rating = json.getInt("rating");
         dto.comment = json.optString("comment", "");
         dto.createdAt = json.optLong("created_at", System.currentTimeMillis());
@@ -26,6 +27,7 @@ public final class ReviewMapper {
                 dto.id,
                 dto.benchId,
                 dto.userId,
+                dto.username,
                 dto.rating,
                 dto.comment,
                 dto.createdAt

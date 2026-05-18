@@ -40,7 +40,7 @@ public class AppViewModelFactory implements ViewModelProvider.Factory {
             return (T) new BenchFormViewModel(container.benchRepository, container.authRepository);
         }
         if (modelClass.isAssignableFrom(BenchDetailViewModel.class)) {
-            return (T) new BenchDetailViewModel(container.benchRepository);
+            return (T) new BenchDetailViewModel(container.benchRepository, container.reviewRepository);
         }
         if (modelClass.isAssignableFrom(ReviewFormViewModel.class)) {
             return (T) new ReviewFormViewModel(container.reviewRepository, container.authRepository);

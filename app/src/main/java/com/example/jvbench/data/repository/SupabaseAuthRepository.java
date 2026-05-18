@@ -60,10 +60,11 @@ public class SupabaseAuthRepository implements AuthRepository {
                 }
                 JSONObject json = new JSONObject(response.getBody());
                 String token = json.getString("access_token");
+                String refreshToken = json.optString("refresh_token", null);
                 JSONObject userJson = json.getJSONObject("user");
                 String userId = userJson.getString("id");
                 String userEmail = userJson.optString("email", email);
-                sessionStore.saveSession(token, userId, userEmail);
+                sessionStore.saveSession(token, userId, userEmail, refreshToken);
 
                 User profileUser = fetchProfileOrFail(userId, userEmail, extractUsernameFromEmail(userEmail));
                 currentUser = profileUser;
@@ -106,6 +107,7 @@ public class SupabaseAuthRepository implements AuthRepository {
                         : UUID.randomUUID().toString();
                 String userEmail = userJson != null ? userJson.optString("email", email) : email;
                 String token = normalizeToken(json.optString("access_token", null));
+                String refreshToken = json.optString("refresh_token", null);
                 if (token == null) {
                     token = normalizeToken(trySignInAndGetToken(email, password));
                 }
@@ -115,7 +117,7 @@ public class SupabaseAuthRepository implements AuthRepository {
                     callback.onError("Compte cree. Verifiez votre email puis connectez-vous.");
                     return;
                 }
-                sessionStore.saveSession(token, userId, userEmail);
+                sessionStore.saveSession(token, userId, userEmail, refreshToken);
 
                 User syncedUser = fetchProfileOrFail(userId, userEmail, username);
                 currentUser = syncedUser;
@@ -134,7 +136,8 @@ public class SupabaseAuthRepository implements AuthRepository {
                     new JSONObject(),
                     true
             );
-            if (!response.isSuccessful() && response.getCode() != 401) {
+            // 401/403 from Supabase means the session is already gone server-side — still clear locally.
+            if (!response.isSuccessful() && response.getCode() != 401 && response.getCode() != 403) {
                 callback.onError(response.getError());
                 return;
             }

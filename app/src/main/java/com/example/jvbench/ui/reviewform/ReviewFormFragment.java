@@ -52,6 +52,9 @@ public class ReviewFormFragment extends Fragment {
             }
         });
 
+        view.findViewById(R.id.backButton).setOnClickListener(v ->
+                NavHostFragment.findNavController(this).navigateUp());
+
         view.findViewById(R.id.saveReviewButton).setOnClickListener(v -> {
             String ratingRaw = ratingInput.getText().toString().trim();
             String comment = commentInput.getText().toString().trim();

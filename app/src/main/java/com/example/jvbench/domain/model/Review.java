@@ -4,14 +4,16 @@ public class Review {
     private final String id;
     private final String benchId;
     private final String userId;
+    private final String username;
     private final int rating;
     private final String comment;
     private final long createdAt;
 
-    public Review(String id, String benchId, String userId, int rating, String comment, long createdAt) {
+    public Review(String id, String benchId, String userId, String username, int rating, String comment, long createdAt) {
         this.id = id;
         this.benchId = benchId;
         this.userId = userId;
+        this.username = username;
         this.rating = rating;
         this.comment = comment;
         this.createdAt = createdAt;
@@ -20,6 +22,7 @@ public class Review {
     public String getId() { return id; }
     public String getBenchId() { return benchId; }
     public String getUserId() { return userId; }
+    public String getUsername() { return username; }
     public int getRating() { return rating; }
     public String getComment() { return comment; }
     public long getCreatedAt() { return createdAt; }

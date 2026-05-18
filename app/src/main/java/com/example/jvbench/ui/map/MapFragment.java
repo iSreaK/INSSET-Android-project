@@ -27,6 +27,7 @@ import org.osmdroid.views.overlay.Marker;
 
 public class MapFragment extends Fragment {
     private MapView mapView;
+    private MapViewModel viewModel;
 
     @Nullable
     @Override
@@ -40,7 +41,7 @@ public class MapFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         App app = (App) requireActivity().getApplication();
-        MapViewModel viewModel = new ViewModelProvider(this, new AppViewModelFactory(app.getAppContainer())).get(MapViewModel.class);
+        viewModel = new ViewModelProvider(this, new AppViewModelFactory(app.getAppContainer())).get(MapViewModel.class);
 
         Configuration.getInstance().setUserAgentValue(requireContext().getPackageName());
         mapView = view.findViewById(R.id.mapView);
@@ -89,7 +90,6 @@ public class MapFragment extends Fragment {
             showBenchMarkers(state.benches);
         });
 
-        viewModel.loadMapData();
     }
 
     private void showBenchMarkers(java.util.List<Bench> benches) {
@@ -109,8 +109,6 @@ public class MapFragment extends Fragment {
             mapView.getOverlays().add(marker);
         }
         mapView.invalidate();
-
-        // TODO: Replace static marker refresh with reactive map layer updates.
     }
 
     @Override
@@ -118,6 +116,9 @@ public class MapFragment extends Fragment {
         super.onResume();
         if (mapView != null) {
             mapView.onResume();
+        }
+        if (viewModel != null) {
+            viewModel.loadMapData();
         }
     }
 
