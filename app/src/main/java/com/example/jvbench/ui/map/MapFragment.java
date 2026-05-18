@@ -3,21 +3,15 @@ package com.example.jvbench.ui.map;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.os.VibratorManager;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewConfiguration;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -32,34 +26,46 @@ import androidx.navigation.fragment.NavHostFragment;
 
 import com.bumptech.glide.Glide;
 import com.example.jvbench.R;
+import com.example.jvbench.core.map.MapMarker;
+import com.example.jvbench.core.map.MapService;
 import com.example.jvbench.core.navigation.NavConstants;
+import com.example.jvbench.core.network.NetworkMonitor;
 import com.example.jvbench.core.theme.WindowInsetsHelper;
 import com.example.jvbench.data.remote.supabase.SupabaseRealtimeClient;
 import com.example.jvbench.di.App;
 import com.example.jvbench.domain.model.Bench;
+import com.example.jvbench.domain.model.GeoPoint;
 import com.example.jvbench.domain.model.User;
 import com.example.jvbench.ui.main.AppViewModelFactory;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.card.MaterialCardView;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import org.osmdroid.api.IGeoPoint;
-import org.osmdroid.bonuspack.clustering.RadiusMarkerClusterer;
-import org.osmdroid.config.Configuration;
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
-import org.osmdroid.util.GeoPoint;
-import org.osmdroid.views.MapView;
-import org.osmdroid.views.overlay.Marker;
-import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
-import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
+import java.util.ArrayList;
+import java.util.List;
 
+/**
+ * Single map screen.
+ *
+ * <p>The Fragment owns the overall UI composition (bottom nav, popup card,
+ * action buttons, offline banner). Everything map-related — rendering,
+ * marker clustering, long-press detection, user-location overlay,
+ * camera animations — is delegated to a {@link MapService} obtained from
+ * {@link com.example.jvbench.di.AppContainer#mapServiceFactory}, so this
+ * Fragment contains zero references to {@code osmdroid.*} or any other
+ * provider-specific type.</p>
+ */
 public class MapFragment extends Fragment {
-    private static final long LONG_PRESS_TIMEOUT_MS = 1000L;
     private static final long VIBRATION_MS = 60L;
+    private static final long USER_RECENTER_ANIM_MS = 900L;
+    private static final double LOCATE_ME_ZOOM = 16.0;
 
-    private MapView mapView;
+    private MapService mapService;
     private MapViewModel viewModel;
-    private RadiusMarkerClusterer markerClusterer;
     private boolean loggedIn;
+    /** Becomes true the first time we animate the camera onto the user's real position. */
+    private boolean hasCenteredOnUser;
+
     @Nullable
     private BottomNavigationView bottomNavCache;
     @Nullable
@@ -69,16 +75,17 @@ public class MapFragment extends Fragment {
     @Nullable
     private Object benchesRealtimeSub;
     @Nullable
-    private MyLocationNewOverlay myLocationOverlay;
-    @Nullable
     private ImageButton locateMeButton;
-
-    private final Handler longPressHandler = new Handler(Looper.getMainLooper());
     @Nullable
-    private Runnable longPressRunnable;
-    private float downX;
-    private float downY;
-    private int touchSlop;
+    private TextView offlineBanner;
+    @Nullable
+    private View addBenchButtonRef;
+    @Nullable
+    private FloatingActionButton nearbyFab;
+    @Nullable
+    private NetworkMonitor networkMonitor;
+    @Nullable
+    private NetworkMonitor.Listener networkListener;
 
     // Popup card state
     private MaterialCardView popupCard;
@@ -103,17 +110,26 @@ public class MapFragment extends Fragment {
         appCache = app;
         viewModel = new ViewModelProvider(this, new AppViewModelFactory(app.getAppContainer())).get(MapViewModel.class);
         realtimeClient = app.getAppContainer().supabaseRealtimeClient;
+        networkMonitor = app.getAppContainer().networkMonitor;
 
-        Configuration.getInstance().setUserAgentValue(requireContext().getPackageName());
-        mapView = view.findViewById(R.id.mapView);
+        // Build the map view through the abstraction so we don't depend on
+        // any particular provider here.
+        mapService = app.getAppContainer().mapServiceFactory.create(requireContext());
+        FrameLayout mapContainer = view.findViewById(R.id.mapContainer);
+        mapContainer.addView(mapService.createMapView(requireContext()),
+                new FrameLayout.LayoutParams(
+                        FrameLayout.LayoutParams.MATCH_PARENT,
+                        FrameLayout.LayoutParams.MATCH_PARENT));
+        mapService.setCenter(MapViewModel.FRANCE_CENTER, MapViewModel.FRANCE_ZOOM);
+        mapService.setOnMarkerClickListener(marker -> {
+            Object payload = marker.getPayload();
+            if (payload instanceof Bench) {
+                showPopup((Bench) payload);
+            }
+        });
+        mapService.setOnLongPressListener(this::handleLongPress);
+
         TextView statusText = view.findViewById(R.id.mapStatusText);
-
-        touchSlop = ViewConfiguration.get(requireContext()).getScaledTouchSlop();
-
-        mapView.setTileSource(TileSourceFactory.MAPNIK);
-        mapView.getController().setZoom(14.0);
-        mapView.getController().setCenter(new GeoPoint(49.8941, 2.2958));
-        mapView.setMultiTouchControls(true);
 
         // Popup wiring
         popupCard = view.findViewById(R.id.markerPopupCard);
@@ -133,38 +149,33 @@ public class MapFragment extends Fragment {
         });
 
         View addBenchButton = view.findViewById(R.id.goBenchFormButton);
+        addBenchButtonRef = addBenchButton;
         User currentUser = app.getAppContainer().authRepository.getCurrentUser();
         loggedIn = currentUser != null;
         addBenchButton.setVisibility(loggedIn ? View.VISIBLE : View.GONE);
 
-        addBenchButton.setOnClickListener(v ->
-                NavHostFragment.findNavController(this).navigate(R.id.action_mapFragment_to_benchFormFragment));
-
-        // Custom 1s long-press detection on the map (replaces MapEventsOverlay)
-        mapView.setOnTouchListener((v, event) -> {
-            switch (event.getActionMasked()) {
-                case MotionEvent.ACTION_DOWN:
-                    downX = event.getX();
-                    downY = event.getY();
-                    cancelLongPress();
-                    final float capturedX = downX;
-                    final float capturedY = downY;
-                    longPressRunnable = () -> handleLongPress(capturedX, capturedY);
-                    longPressHandler.postDelayed(longPressRunnable, LONG_PRESS_TIMEOUT_MS);
-                    break;
-                case MotionEvent.ACTION_MOVE:
-                    if (Math.abs(event.getX() - downX) > touchSlop
-                            || Math.abs(event.getY() - downY) > touchSlop) {
-                        cancelLongPress();
-                    }
-                    break;
-                case MotionEvent.ACTION_POINTER_DOWN:
-                case MotionEvent.ACTION_UP:
-                case MotionEvent.ACTION_CANCEL:
-                    cancelLongPress();
-                    break;
+        addBenchButton.setOnClickListener(v -> {
+            if (networkMonitor != null && !networkMonitor.isOnline()) {
+                Toast.makeText(requireContext(), R.string.offline_action_blocked, Toast.LENGTH_SHORT).show();
+                return;
             }
-            return false; // let the map handle pan/zoom
+            NavHostFragment.findNavController(this).navigate(R.id.action_mapFragment_to_benchFormFragment);
+        });
+
+        offlineBanner = view.findViewById(R.id.offlineBanner);
+
+        nearbyFab = view.findViewById(R.id.nearbyFab);
+        nearbyFab.setOnClickListener(v -> {
+            if (networkMonitor != null && !networkMonitor.isOnline()) {
+                Toast.makeText(requireContext(), R.string.nearby_button_disabled_offline, Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (!hasLocationPermission()) {
+                Toast.makeText(requireContext(), R.string.nearby_button_disabled_no_perm, Toast.LENGTH_SHORT).show();
+                return;
+            }
+            NavHostFragment.findNavController(this)
+                    .navigate(R.id.action_mapFragment_to_nearbyBenchesFragment);
         });
 
         BottomNavigationView bottomNavigationView = view.findViewById(R.id.mapBottomNav);
@@ -206,19 +217,36 @@ public class MapFragment extends Fragment {
                 statusText.setText(R.string.error_map_load);
                 statusText.setVisibility(View.VISIBLE);
             } else {
-                // Hide banner when everything went fine; markers and count speak for themselves.
                 statusText.setVisibility(View.GONE);
             }
 
-            mapView.getController().setCenter(new GeoPoint(state.center.getLatitude(), state.center.getLongitude()));
-            showBenchMarkers(state.benches);
+            // Only animate to the user's coordinates the *first* time we get
+            // a real fix. Subsequent updates (realtime bench refresh) must
+            // not snap the camera back from wherever the user has panned.
+            if (state.userLocationKnown && !hasCenteredOnUser) {
+                mapService.animateTo(state.center, MapViewModel.USER_ZOOM, USER_RECENTER_ANIM_MS);
+                hasCenteredOnUser = true;
+            }
+            renderMarkers(state.benches);
         });
 
         viewModel.loadMapData();
 
-        // Compass / locate-me button (top-right of the map)
         locateMeButton = view.findViewById(R.id.locateMeButton);
         setupLocationOverlay();
+    }
+
+    private void renderMarkers(@NonNull List<Bench> benches) {
+        List<MapMarker> markers = new ArrayList<>(benches.size());
+        for (Bench bench : benches) {
+            markers.add(new MapMarker(
+                    bench.getId(),
+                    new GeoPoint(bench.getLatitude(), bench.getLongitude()),
+                    bench.getName() != null ? bench.getName() : "",
+                    bench.getDescription(),
+                    bench));
+        }
+        mapService.setMarkers(markers);
     }
 
     private void setupLocationOverlay() {
@@ -235,20 +263,13 @@ public class MapFragment extends Fragment {
             return;
         }
 
-        // Add the my-location overlay (user dot + accuracy circle) once
-        if (myLocationOverlay == null) {
-            myLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(requireContext()), mapView);
-            myLocationOverlay.enableMyLocation();
-            mapView.getOverlays().add(myLocationOverlay);
-        }
+        mapService.enableUserLocationOverlay();
 
         locateMeButton.setOnClickListener(v -> {
-            if (myLocationOverlay == null) return;
-            GeoPoint loc = myLocationOverlay.getMyLocation();
+            GeoPoint loc = mapService.getUserLocation();
             if (loc != null) {
-                // Animate position AND zoom together in one ~700ms tween,
-                // so re-centering from a far zoom level is fluid (no snap).
-                mapView.getController().animateTo(loc, 16.0, 700L);
+                mapService.animateTo(loc, LOCATE_ME_ZOOM, 700L);
+                hasCenteredOnUser = true;
             } else {
                 Toast.makeText(requireContext(), R.string.locate_me_waiting, Toast.LENGTH_SHORT).show();
             }
@@ -260,25 +281,16 @@ public class MapFragment extends Fragment {
                 || ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
 
-    private void cancelLongPress() {
-        if (longPressRunnable != null) {
-            longPressHandler.removeCallbacks(longPressRunnable);
-            longPressRunnable = null;
-        }
-    }
-
-    private void handleLongPress(float x, float y) {
-        longPressRunnable = null;
+    private void handleLongPress(@NonNull GeoPoint point) {
         if (!isAdded()) return;
         if (!loggedIn) {
             Toast.makeText(requireContext(), R.string.error_guest_action_blocked, Toast.LENGTH_SHORT).show();
             return;
         }
-        IGeoPoint geoPoint = mapView.getProjection().fromPixels((int) x, (int) y);
         triggerHaptic();
         Bundle args = new Bundle();
-        args.putFloat(NavConstants.ARG_PREFILL_LAT, (float) geoPoint.getLatitude());
-        args.putFloat(NavConstants.ARG_PREFILL_LNG, (float) geoPoint.getLongitude());
+        args.putFloat(NavConstants.ARG_PREFILL_LAT, (float) point.getLatitude());
+        args.putFloat(NavConstants.ARG_PREFILL_LNG, (float) point.getLongitude());
         NavHostFragment.findNavController(this)
                 .navigate(R.id.action_mapFragment_to_benchFormFragment, args);
     }
@@ -301,34 +313,6 @@ public class MapFragment extends Fragment {
         }
     }
 
-    private void showBenchMarkers(java.util.List<Bench> benches) {
-        if (markerClusterer != null) {
-            mapView.getOverlays().remove(markerClusterer);
-        }
-        markerClusterer = new RadiusMarkerClusterer(requireContext());
-        Bitmap clusterIcon = drawableToBitmap(R.drawable.marker_cluster, 96, 96);
-        if (clusterIcon != null) {
-            markerClusterer.setIcon(clusterIcon);
-        }
-        markerClusterer.setRadius(120);
-        markerClusterer.getTextPaint().setTextSize(36f);
-        markerClusterer.getTextPaint().setColor(0xFFFFFFFF);
-
-        for (Bench bench : benches) {
-            Marker marker = new Marker(mapView);
-            marker.setPosition(new GeoPoint(bench.getLatitude(), bench.getLongitude()));
-            marker.setTitle(bench.getName());
-            marker.setSnippet(bench.getDescription());
-            marker.setOnMarkerClickListener((clickedMarker, mv) -> {
-                showPopup(bench);
-                return true;
-            });
-            markerClusterer.add(marker);
-        }
-        mapView.getOverlays().add(markerClusterer);
-        mapView.invalidate();
-    }
-
     private void showPopup(Bench bench) {
         selectedBench = bench;
         popupName.setText(bench.getName());
@@ -348,33 +332,42 @@ public class MapFragment extends Fragment {
         selectedBench = null;
     }
 
-    @Nullable
-    private Bitmap drawableToBitmap(int drawableRes, int widthPx, int heightPx) {
-        Drawable drawable = ContextCompat.getDrawable(requireContext(), drawableRes);
-        if (drawable == null) return null;
-        Bitmap bitmap = Bitmap.createBitmap(widthPx, heightPx, Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-        drawable.setBounds(0, 0, widthPx, heightPx);
-        drawable.draw(canvas);
-        return bitmap;
+    /**
+     * Called by {@link NetworkMonitor} (on the main thread) when connectivity
+     * flips. Shows or hides the offline banner and visually grays out the
+     * actions that require the Supabase backend.
+     */
+    private void applyOnlineState(boolean online) {
+        if (offlineBanner != null) {
+            offlineBanner.setVisibility(online ? View.GONE : View.VISIBLE);
+        }
+        if (addBenchButtonRef != null && loggedIn) {
+            addBenchButtonRef.setEnabled(online);
+            addBenchButtonRef.setAlpha(online ? 1f : 0.5f);
+        }
+        if (nearbyFab != null) {
+            nearbyFab.setEnabled(online);
+            nearbyFab.setAlpha(online ? 1f : 0.5f);
+        }
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        if (mapView != null) {
-            mapView.onResume();
+        if (mapService != null) {
+            mapService.onResume();
         }
-        // Note: myLocationOverlay is created fresh in setupLocationOverlay()
-        // each time onViewCreated runs, and nulled out in onDestroyView. We
-        // don't try to revive a stale overlay here — that caused a crash when
-        // navigating back to the map (provider was detached but ref kept).
         if (realtimeClient != null && benchesRealtimeSub == null) {
             benchesRealtimeSub = realtimeClient.subscribeTable("public", "benches", (eventType, record) -> {
                 if (viewModel != null) {
                     viewModel.loadMapData();
                 }
             });
+        }
+
+        if (networkMonitor != null && networkListener == null) {
+            networkListener = this::applyOnlineState;
+            networkMonitor.addListener(networkListener);
         }
 
         // Cold-start case: getCurrentUser() may have returned a USER-role
@@ -398,36 +391,28 @@ public class MapFragment extends Fragment {
 
     @Override
     public void onPause() {
-        if (mapView != null) {
-            mapView.onPause();
+        if (mapService != null) {
+            mapService.onPause();
         }
-        if (myLocationOverlay != null) {
-            try {
-                myLocationOverlay.disableMyLocation();
-            } catch (Exception ignored) {
-                // Overlay may already be detached; safe to ignore
-            }
-        }
-        cancelLongPress();
         if (realtimeClient != null && benchesRealtimeSub != null) {
             realtimeClient.unsubscribe(benchesRealtimeSub);
             benchesRealtimeSub = null;
+        }
+        if (networkMonitor != null && networkListener != null) {
+            networkMonitor.removeListener(networkListener);
+            networkListener = null;
         }
         super.onPause();
     }
 
     @Override
     public void onDestroyView() {
-        // Drop the overlay reference because the underlying MapView is gone;
-        // the next onCreateView will rebuild it from scratch.
-        if (myLocationOverlay != null) {
-            try {
-                myLocationOverlay.disableMyLocation();
-            } catch (Exception ignored) {
-            }
-            myLocationOverlay = null;
+        if (mapService != null) {
+            mapService.onDestroyView();
         }
-        markerClusterer = null;
+        offlineBanner = null;
+        addBenchButtonRef = null;
+        nearbyFab = null;
         super.onDestroyView();
     }
 }

@@ -5,6 +5,8 @@ import android.content.Context;
 import com.example.jvbench.core.geofence.GeofenceManager;
 import com.example.jvbench.core.location.AndroidLocationProvider;
 import com.example.jvbench.core.location.LocationProvider;
+import com.example.jvbench.core.map.MapServiceFactory;
+import com.example.jvbench.core.map.osmdroid.OsmdroidMapServiceFactory;
 import com.example.jvbench.core.network.NetworkMonitor;
 import com.example.jvbench.core.permissions.PermissionManager;
 import com.example.jvbench.data.remote.supabase.SupabaseApiClient;
@@ -36,6 +38,12 @@ public class AppContainer {
     public final PermissionManager permissionManager;
     public final NetworkMonitor networkMonitor;
     public final GeofenceManager geofenceManager;
+    /**
+     * The active map engine binding. To swap OpenStreetMap for Google Maps
+     * (or any other provider), implement {@link MapServiceFactory} and bind
+     * it here — the UI layer never references a concrete map type.
+     */
+    public final MapServiceFactory mapServiceFactory;
 
     public AppContainer(Context context) {
         supabaseClientProvider = new SupabaseClientProvider();
@@ -51,5 +59,6 @@ public class AppContainer {
         permissionManager = new PermissionManager();
         networkMonitor = new NetworkMonitor(context);
         geofenceManager = new GeofenceManager(context);
+        mapServiceFactory = new OsmdroidMapServiceFactory();
     }
 }

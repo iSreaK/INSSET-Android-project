@@ -10,8 +10,11 @@
         android:layout_height="0dp"
         android:layout_weight="1">
 
-        <org.osmdroid.views.MapView
-            android:id="@+id/mapView"
+        <!-- Provider-agnostic container: the MapService implementation
+             inflates its own native view (osmdroid MapView, GoogleMap
+             SupportMapFragment, ...) and attaches it here. -->
+        <FrameLayout
+            android:id="@+id/mapContainer"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
