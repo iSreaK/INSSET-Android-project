@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.jvbench.R;
 import com.example.jvbench.core.navigation.NavConstants;
+import com.example.jvbench.data.remote.supabase.SupabaseRealtimeClient;
 import com.example.jvbench.di.App;
 import com.example.jvbench.domain.model.Bench;
 import com.example.jvbench.domain.model.User;
@@ -32,6 +33,12 @@ public class BenchDetailFragment extends Fragment {
 
     private BenchDetailViewModel viewModel;
     private LinearLayout ratingCirclesRow;
+    @Nullable
+    private SupabaseRealtimeClient realtimeClient;
+    @Nullable
+    private Object reviewsSub;
+    @Nullable
+    private Object benchSub;
 
     @Nullable
     @Override
@@ -46,6 +53,7 @@ public class BenchDetailFragment extends Fragment {
 
         App app = (App) requireActivity().getApplication();
         viewModel = new ViewModelProvider(this, new AppViewModelFactory(app.getAppContainer())).get(BenchDetailViewModel.class);
+        realtimeClient = app.getAppContainer().supabaseRealtimeClient;
 
         TextView nameText = view.findViewById(R.id.benchDetailNameText);
         TextView descriptionText = view.findViewById(R.id.benchDetailDescriptionText);
@@ -183,11 +191,36 @@ public class BenchDetailFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (viewModel != null) {
-            String benchId = getArguments() != null ? getArguments().getString(NavConstants.ARG_BENCH_ID) : null;
-            if (benchId != null && !benchId.isBlank()) {
-                viewModel.loadReviews(benchId);
-            }
+        if (viewModel == null) return;
+        final String benchId = getArguments() != null ? getArguments().getString(NavConstants.ARG_BENCH_ID) : null;
+        if (benchId == null || benchId.isBlank()) return;
+
+        viewModel.loadReviews(benchId);
+
+        if (realtimeClient != null && reviewsSub == null) {
+            reviewsSub = realtimeClient.subscribeTable("public", "reviews", (eventType, record) -> {
+                // Only react to events that mention this bench
+                if (record == null || benchId.equals(record.optString("bench_id"))) {
+                    viewModel.loadReviews(benchId);
+                    viewModel.loadBench(benchId);
+                }
+            });
         }
+        if (realtimeClient != null && benchSub == null) {
+            benchSub = realtimeClient.subscribeTable("public", "benches", (eventType, record) -> {
+                if (record == null || benchId.equals(record.optString("id"))) {
+                    viewModel.loadBench(benchId);
+                }
+            });
+        }
+    }
+
+    @Override
+    public void onPause() {
+        if (realtimeClient != null) {
+            if (reviewsSub != null) { realtimeClient.unsubscribe(reviewsSub); reviewsSub = null; }
+            if (benchSub != null)   { realtimeClient.unsubscribe(benchSub);   benchSub = null; }
+        }
+        super.onPause();
     }
 }

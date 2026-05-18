@@ -40,6 +40,7 @@
 
     <string name="loading">Chargement...</string>
     <string name="map_ready">Carte prete. %1$d banc(s).</string>
+    <string name="error_map_load">Impossible de charger les bancs. Verifie ta connexion.</string>
     <string name="coordinates_format">Lat: %1$.5f, Lng: %2$.5f</string>
     <string name="bench_meta_format">Note: %1$.1f/10 (%2$d avis)</string>
 

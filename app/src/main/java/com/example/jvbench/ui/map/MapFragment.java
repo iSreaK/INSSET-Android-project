@@ -30,6 +30,7 @@ import androidx.navigation.fragment.NavHostFragment;
 import com.bumptech.glide.Glide;
 import com.example.jvbench.R;
 import com.example.jvbench.core.navigation.NavConstants;
+import com.example.jvbench.data.remote.supabase.SupabaseRealtimeClient;
 import com.example.jvbench.di.App;
 import com.example.jvbench.domain.model.Bench;
 import com.example.jvbench.domain.model.User;
@@ -50,8 +51,13 @@ public class MapFragment extends Fragment {
     private static final long VIBRATION_MS = 60L;
 
     private MapView mapView;
+    private MapViewModel viewModel;
     private RadiusMarkerClusterer markerClusterer;
     private boolean loggedIn;
+    @Nullable
+    private SupabaseRealtimeClient realtimeClient;
+    @Nullable
+    private Object benchesRealtimeSub;
 
     private final Handler longPressHandler = new Handler(Looper.getMainLooper());
     @Nullable
@@ -80,7 +86,8 @@ public class MapFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         App app = (App) requireActivity().getApplication();
-        MapViewModel viewModel = new ViewModelProvider(this, new AppViewModelFactory(app.getAppContainer())).get(MapViewModel.class);
+        viewModel = new ViewModelProvider(this, new AppViewModelFactory(app.getAppContainer())).get(MapViewModel.class);
+        realtimeClient = app.getAppContainer().supabaseRealtimeClient;
 
         Configuration.getInstance().setUserAgentValue(requireContext().getPackageName());
         mapView = view.findViewById(R.id.mapView);
@@ -169,12 +176,15 @@ public class MapFragment extends Fragment {
             }
             if (state.loading) {
                 statusText.setText(R.string.loading);
+                statusText.setVisibility(View.VISIBLE);
                 return;
             }
             if (state.error != null) {
-                statusText.setText(state.error);
+                statusText.setText(R.string.error_map_load);
+                statusText.setVisibility(View.VISIBLE);
             } else {
-                statusText.setText(getString(R.string.map_ready, state.benches.size()));
+                // Hide banner when everything went fine; markers and count speak for themselves.
+                statusText.setVisibility(View.GONE);
             }
 
             mapView.getController().setCenter(new GeoPoint(state.center.getLatitude(), state.center.getLongitude()));
@@ -289,6 +299,13 @@ public class MapFragment extends Fragment {
         if (mapView != null) {
             mapView.onResume();
         }
+        if (realtimeClient != null && benchesRealtimeSub == null) {
+            benchesRealtimeSub = realtimeClient.subscribeTable("public", "benches", (eventType, record) -> {
+                if (viewModel != null) {
+                    viewModel.loadMapData();
+                }
+            });
+        }
     }
 
     @Override
@@ -297,6 +314,10 @@ public class MapFragment extends Fragment {
             mapView.onPause();
         }
         cancelLongPress();
+        if (realtimeClient != null && benchesRealtimeSub != null) {
+            realtimeClient.unsubscribe(benchesRealtimeSub);
+            benchesRealtimeSub = null;
+        }
         super.onPause();
     }
 }

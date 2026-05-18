@@ -60,10 +60,11 @@ public class SupabaseAuthRepository implements AuthRepository {
                 }
                 JSONObject json = new JSONObject(response.getBody());
                 String token = json.getString("access_token");
+                String refresh = json.optString("refresh_token", null);
                 JSONObject userJson = json.getJSONObject("user");
                 String userId = userJson.getString("id");
                 String userEmail = userJson.optString("email", email);
-                sessionStore.saveSession(token, userId, userEmail);
+                sessionStore.saveSession(token, refresh, userId, userEmail);
 
                 User profileUser = fetchProfileOrFail(userId, userEmail, extractUsernameFromEmail(userEmail));
                 currentUser = profileUser;
@@ -106,8 +107,13 @@ public class SupabaseAuthRepository implements AuthRepository {
                         : UUID.randomUUID().toString();
                 String userEmail = userJson != null ? userJson.optString("email", email) : email;
                 String token = normalizeToken(json.optString("access_token", null));
+                String refresh = json.optString("refresh_token", null);
                 if (token == null) {
-                    token = normalizeToken(trySignInAndGetToken(email, password));
+                    String[] pair = trySignInAndGetTokenPair(email, password);
+                    if (pair != null) {
+                        token = normalizeToken(pair[0]);
+                        refresh = pair[1];
+                    }
                 }
                 if (token == null) {
                     sessionStore.clearSession();
@@ -115,7 +121,7 @@ public class SupabaseAuthRepository implements AuthRepository {
                     callback.onError("Compte cree. Verifiez votre email puis connectez-vous.");
                     return;
                 }
-                sessionStore.saveSession(token, userId, userEmail);
+                sessionStore.saveSession(token, refresh, userId, userEmail);
 
                 User syncedUser = fetchProfileOrFail(userId, userEmail, username);
                 currentUser = syncedUser;
@@ -300,7 +306,7 @@ public class SupabaseAuthRepository implements AuthRepository {
         }
     }
 
-    private String trySignInAndGetToken(String email, String password) {
+    private String[] trySignInAndGetTokenPair(String email, String password) {
         try {
             JSONObject payload = new JSONObject()
                     .put("email", email)
@@ -314,7 +320,10 @@ public class SupabaseAuthRepository implements AuthRepository {
                 return null;
             }
             JSONObject signInJson = new JSONObject(signInResponse.getBody());
-            return normalizeToken(signInJson.optString("access_token", null));
+            String access = normalizeToken(signInJson.optString("access_token", null));
+            String refresh = signInJson.optString("refresh_token", null);
+            if (access == null) return null;
+            return new String[]{access, refresh};
         } catch (JSONException exception) {
             return null;
         }
