@@ -49,7 +49,6 @@ public class SettingsFragment extends Fragment {
         com.example.jvbench.domain.model.User u = app.getAppContainer().authRepository.getCurrentUser();
         bottomNavigationView.getMenu().findItem(R.id.navAdminItem)
                 .setVisible(u != null && u.getRole().isAdmin());
-        bottomNavigationView.setSelectedItemId(R.id.navSettingsItem);
         bottomNavigationView.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
             if (id == R.id.navSettingsItem) return true;
@@ -67,5 +66,9 @@ public class SettingsFragment extends Fragment {
             }
             return false;
         });
+        // Apply the visual selection only after the BottomNavigationView is
+        // laid out — calling setSelectedItemId too early can leave the wrong
+        // tab highlighted.
+        bottomNavigationView.post(() -> bottomNavigationView.setSelectedItemId(R.id.navSettingsItem));
     }
 }

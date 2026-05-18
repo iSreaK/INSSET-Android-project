@@ -56,7 +56,10 @@ public class AccountFragment extends Fragment {
 
         BottomNavigationView bottomNavigationView = view.findViewById(R.id.accountBottomNav);
         WindowInsetsHelper.addBottomSystemInset(bottomNavigationView);
-        bottomNavigationView.setSelectedItemId(R.id.navAccountItem);
+        // Wire the listener FIRST, then post the selection. Calling
+        // setSelectedItemId() before the BottomNavigationView is laid out can
+        // silently drop the highlight on some Material versions, which would
+        // leave the user looking at the wrong selected tab.
         bottomNavigationView.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
             if (id == R.id.navAccountItem) {
@@ -76,6 +79,7 @@ public class AccountFragment extends Fragment {
             }
             return false;
         });
+        bottomNavigationView.post(() -> bottomNavigationView.setSelectedItemId(R.id.navAccountItem));
         // Show the admin tab only for administrators. The cached current user
         // already has its role from the last loadCurrentUser() call; if it's
         // still null we leave the tab hidden — the observer below will refresh

@@ -183,7 +183,6 @@ public class MapFragment extends Fragment {
         WindowInsetsHelper.addBottomSystemInset(bottomNavigationView);
         boolean isAdminUser = currentUser != null && currentUser.getRole().isAdmin();
         bottomNavigationView.getMenu().findItem(R.id.navAdminItem).setVisible(isAdminUser);
-        bottomNavigationView.setSelectedItemId(R.id.navMapItem);
         bottomNavigationView.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
             if (id == R.id.navMapItem) {
@@ -203,6 +202,7 @@ public class MapFragment extends Fragment {
             }
             return false;
         });
+        bottomNavigationView.post(() -> bottomNavigationView.setSelectedItemId(R.id.navMapItem));
 
         viewModel.getUiState().observe(getViewLifecycleOwner(), state -> {
             if (state == null) {
@@ -254,8 +254,8 @@ public class MapFragment extends Fragment {
         boolean hasPermission = hasLocationPermission();
         locateMeButton.setEnabled(hasPermission);
         locateMeButton.setImageResource(hasPermission
-                ? R.drawable.ic_compass
-                : R.drawable.ic_compass_disabled);
+                ? R.drawable.ic_locate_me
+                : R.drawable.ic_locate_me_disabled);
 
         if (!hasPermission) {
             locateMeButton.setOnClickListener(v ->

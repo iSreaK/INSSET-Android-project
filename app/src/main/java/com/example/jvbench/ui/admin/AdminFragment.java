@@ -92,7 +92,6 @@ public class AdminFragment extends Fragment {
         BottomNavigationView nav = view.findViewById(R.id.adminBottomNav);
         WindowInsetsHelper.addBottomSystemInset(nav);
         nav.getMenu().findItem(R.id.navAdminItem).setVisible(true);
-        nav.setSelectedItemId(R.id.navAdminItem);
         nav.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
             if (id == R.id.navAdminItem) return true;
@@ -110,6 +109,9 @@ public class AdminFragment extends Fragment {
             }
             return false;
         });
+        // Defer the highlight until layout: avoids a stale visual selection
+        // that can persist when the BottomNavigationView is freshly inflated.
+        nav.post(() -> nav.setSelectedItemId(R.id.navAdminItem));
 
         viewModel.load();
     }
