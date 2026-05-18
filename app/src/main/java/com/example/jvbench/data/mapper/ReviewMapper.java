@@ -18,6 +18,10 @@ public final class ReviewMapper {
         dto.rating = json.getInt("rating");
         dto.comment = json.optString("comment", "");
         dto.createdAt = json.optLong("created_at", System.currentTimeMillis());
+        JSONObject author = json.optJSONObject("author");
+        if (author != null) {
+            dto.authorUsername = author.optString("username", null);
+        }
         return dto;
     }
 
@@ -28,7 +32,8 @@ public final class ReviewMapper {
                 dto.userId,
                 dto.rating,
                 dto.comment,
-                dto.createdAt
+                dto.createdAt,
+                dto.authorUsername
         );
     }
 

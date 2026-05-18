@@ -18,4 +18,6 @@
     <!-- bottom navigation bar -->
     <color name="jv_bottom_nav_background">#FFFFFF</color>
     <color name="jv_bottom_nav_item">#0B132B</color>
+    <!-- rating circles -->
+    <color name="jv_rating_empty">#D6D6D6</color>
 </resources>

@@ -7,4 +7,5 @@ public class ReviewDto {
     public int rating;
     public String comment;
     public long createdAt;
+    public String authorUsername;
 }

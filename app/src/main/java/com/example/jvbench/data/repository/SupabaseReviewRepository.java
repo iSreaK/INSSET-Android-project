@@ -31,7 +31,7 @@ public class SupabaseReviewRepository implements ReviewRepository {
     public void getReviewsForBench(String benchId, ResultCallback<List<Review>> callback) {
         executor.execute(() -> {
             String url = clientProvider.getRestBaseUrl()
-                    + "/reviews?select=id,bench_id,user_id,rating,comment,created_at"
+                    + "/reviews?select=id,bench_id,user_id,rating,comment,created_at,author:profiles!user_id(username)"
                     + "&bench_id=eq." + benchId
                     + "&order=created_at.desc";
             SupabaseResponse response = apiClient.get(url, false);

@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -27,7 +28,10 @@ import com.example.jvbench.ui.main.AppViewModelFactory;
 
 public class BenchDetailFragment extends Fragment {
 
+    private static final int RATING_CIRCLES = 10;
+
     private BenchDetailViewModel viewModel;
+    private LinearLayout ratingCirclesRow;
 
     @Nullable
     @Override
@@ -47,7 +51,8 @@ public class BenchDetailFragment extends Fragment {
         TextView descriptionText = view.findViewById(R.id.benchDetailDescriptionText);
         TextView authorText = view.findViewById(R.id.benchDetailAuthorText);
         TextView coordinatesText = view.findViewById(R.id.benchDetailCoordinatesText);
-        TextView metaText = view.findViewById(R.id.benchDetailMetaText);
+        TextView ratingBigText = view.findViewById(R.id.benchDetailRatingBig);
+        ratingCirclesRow = view.findViewById(R.id.ratingCirclesRow);
         ImageView imageView = view.findViewById(R.id.benchDetailImage);
         View addReviewButton = view.findViewById(R.id.goReviewFormButton);
         View editButton = view.findViewById(R.id.editBenchButton);
@@ -59,6 +64,8 @@ public class BenchDetailFragment extends Fragment {
         ReviewsAdapter reviewsAdapter = new ReviewsAdapter();
         reviewsRecycler.setLayoutManager(new LinearLayoutManager(requireContext()));
         reviewsRecycler.setAdapter(reviewsAdapter);
+
+        buildRatingCircles();
 
         backButton.setOnClickListener(v -> NavHostFragment.findNavController(this).navigateUp());
 
@@ -93,9 +100,7 @@ public class BenchDetailFragment extends Fragment {
                 .show());
 
         viewModel.getUiState().observe(getViewLifecycleOwner(), state -> {
-            if (state == null) {
-                return;
-            }
+            if (state == null) return;
             if (state.deleted) {
                 NavHostFragment.findNavController(this).navigateUp();
                 return;
@@ -116,7 +121,8 @@ public class BenchDetailFragment extends Fragment {
             nameText.setText(bench.getName());
             descriptionText.setText(bench.getDescription());
             coordinatesText.setText(getString(R.string.coordinates_format, bench.getLatitude(), bench.getLongitude()));
-            metaText.setText(getString(R.string.bench_meta_format, bench.getAverageRating(), bench.getReviewCount()));
+            ratingBigText.setText(getString(R.string.bench_rating_big_format, bench.getAverageRating()));
+            paintRatingCircles((int) Math.round(bench.getAverageRating()));
 
             if (state.authorUsername != null && !state.authorUsername.isBlank()) {
                 authorText.setText(getString(R.string.bench_author_format, state.authorUsername));
@@ -127,10 +133,7 @@ public class BenchDetailFragment extends Fragment {
 
             String imageUrl = bench.getImageUrl();
             if (imageUrl != null && !imageUrl.isBlank()) {
-                imageView.setVisibility(View.VISIBLE);
                 Glide.with(this).load(imageUrl).centerCrop().into(imageView);
-            } else {
-                imageView.setVisibility(View.GONE);
             }
 
             boolean canEdit = currentUser != null
@@ -151,6 +154,30 @@ public class BenchDetailFragment extends Fragment {
         });
 
         viewModel.loadBench(benchId);
+    }
+
+    private void buildRatingCircles() {
+        ratingCirclesRow.removeAllViews();
+        int size = (int) (16 * getResources().getDisplayMetrics().density);
+        int margin = (int) (4 * getResources().getDisplayMetrics().density);
+        for (int i = 0; i < RATING_CIRCLES; i++) {
+            View dot = new View(requireContext());
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(size, size);
+            if (i > 0) lp.leftMargin = margin;
+            dot.setLayoutParams(lp);
+            dot.setBackgroundResource(R.drawable.circle_rating_empty);
+            ratingCirclesRow.addView(dot);
+        }
+    }
+
+    private void paintRatingCircles(int filledCount) {
+        int total = ratingCirclesRow.getChildCount();
+        for (int i = 0; i < total; i++) {
+            View dot = ratingCirclesRow.getChildAt(i);
+            dot.setBackgroundResource(i < filledCount
+                    ? R.drawable.circle_rating_filled
+                    : R.drawable.circle_rating_empty);
+        }
     }
 
     @Override

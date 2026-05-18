@@ -36,7 +36,12 @@ public class ReviewsAdapter extends RecyclerView.Adapter<ReviewsAdapter.ReviewVi
     @Override
     public void onBindViewHolder(@NonNull ReviewViewHolder holder, int position) {
         Review review = items.get(position);
-        holder.ratingText.setText(holder.itemView.getContext().getString(R.string.review_rating_format, review.getRating()));
+        String username = review.getAuthorUsername();
+        if (username == null || username.isBlank()) {
+            username = holder.itemView.getContext().getString(R.string.review_unknown_author);
+        }
+        holder.authorText.setText(username);
+        holder.ratingText.setText(holder.itemView.getContext().getString(R.string.review_rating_short_format, review.getRating()));
         if (review.getComment() == null || review.getComment().isBlank()) {
             holder.commentText.setVisibility(View.GONE);
         } else {
@@ -51,11 +56,13 @@ public class ReviewsAdapter extends RecyclerView.Adapter<ReviewsAdapter.ReviewVi
     }
 
     static class ReviewViewHolder extends RecyclerView.ViewHolder {
+        final TextView authorText;
         final TextView ratingText;
         final TextView commentText;
 
         ReviewViewHolder(@NonNull View itemView) {
             super(itemView);
+            authorText = itemView.findViewById(R.id.itemReviewAuthor);
             ratingText = itemView.findViewById(R.id.itemReviewRating);
             commentText = itemView.findViewById(R.id.itemReviewComment);
         }
