@@ -32,6 +32,7 @@ import androidx.navigation.fragment.NavHostFragment;
 import com.bumptech.glide.Glide;
 import com.example.jvbench.R;
 import com.example.jvbench.core.navigation.NavConstants;
+import com.example.jvbench.core.theme.WindowInsetsHelper;
 import com.example.jvbench.di.App;
 import com.example.jvbench.ui.main.AppViewModelFactory;
 
@@ -71,6 +72,9 @@ public class BenchFormFragment extends Fragment {
 
         App app = (App) requireActivity().getApplication();
         viewModel = new ViewModelProvider(this, new AppViewModelFactory(app.getAppContainer())).get(BenchFormViewModel.class);
+
+        View content = view.findViewById(R.id.benchFormContent);
+        if (content != null) WindowInsetsHelper.addBottomSystemInset(content);
 
         TextView titleText = view.findViewById(R.id.benchFormTitle);
         EditText nameInput = view.findViewById(R.id.benchNameInput);

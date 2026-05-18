@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.jvbench.R;
 import com.example.jvbench.core.navigation.NavConstants;
+import com.example.jvbench.core.theme.WindowInsetsHelper;
 import com.example.jvbench.di.App;
 import com.example.jvbench.ui.main.AppViewModelFactory;
 
@@ -41,6 +42,8 @@ public class MyBenchesFragment extends Fragment {
         TextView statusText = view.findViewById(R.id.myBenchesStatusText);
         RecyclerView recyclerView = view.findViewById(R.id.myBenchesRecycler);
         View backButton = view.findViewById(R.id.backButton);
+
+        WindowInsetsHelper.addBottomSystemInset(recyclerView);
 
         backButton.setOnClickListener(v -> NavHostFragment.findNavController(this).navigateUp());
 

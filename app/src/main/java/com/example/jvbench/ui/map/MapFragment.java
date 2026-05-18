@@ -33,6 +33,7 @@ import androidx.navigation.fragment.NavHostFragment;
 import com.bumptech.glide.Glide;
 import com.example.jvbench.R;
 import com.example.jvbench.core.navigation.NavConstants;
+import com.example.jvbench.core.theme.WindowInsetsHelper;
 import com.example.jvbench.data.remote.supabase.SupabaseRealtimeClient;
 import com.example.jvbench.di.App;
 import com.example.jvbench.domain.model.Bench;
@@ -59,6 +60,10 @@ public class MapFragment extends Fragment {
     private MapViewModel viewModel;
     private RadiusMarkerClusterer markerClusterer;
     private boolean loggedIn;
+    @Nullable
+    private BottomNavigationView bottomNavCache;
+    @Nullable
+    private App appCache;
     @Nullable
     private SupabaseRealtimeClient realtimeClient;
     @Nullable
@@ -95,6 +100,7 @@ public class MapFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         App app = (App) requireActivity().getApplication();
+        appCache = app;
         viewModel = new ViewModelProvider(this, new AppViewModelFactory(app.getAppContainer())).get(MapViewModel.class);
         realtimeClient = app.getAppContainer().supabaseRealtimeClient;
 
@@ -162,6 +168,8 @@ public class MapFragment extends Fragment {
         });
 
         BottomNavigationView bottomNavigationView = view.findViewById(R.id.mapBottomNav);
+        bottomNavCache = bottomNavigationView;
+        WindowInsetsHelper.addBottomSystemInset(bottomNavigationView);
         boolean isAdminUser = currentUser != null && currentUser.getRole().isAdmin();
         bottomNavigationView.getMenu().findItem(R.id.navAdminItem).setVisible(isAdminUser);
         bottomNavigationView.setSelectedItemId(R.id.navMapItem);
@@ -366,6 +374,24 @@ public class MapFragment extends Fragment {
                 if (viewModel != null) {
                     viewModel.loadMapData();
                 }
+            });
+        }
+
+        // Cold-start case: getCurrentUser() may have returned a USER-role
+        // fallback while loadCurrentUser was still in-flight. Refresh the
+        // admin tab visibility once the real profile lands.
+        if (appCache != null) {
+            appCache.getAppContainer().authRepository.loadCurrentUser(new com.example.jvbench.core.common.ResultCallback<com.example.jvbench.domain.model.User>() {
+                @Override
+                public void onSuccess(com.example.jvbench.domain.model.User result) {
+                    if (!isAdded() || bottomNavCache == null || result == null) return;
+                    requireActivity().runOnUiThread(() ->
+                            bottomNavCache.getMenu().findItem(R.id.navAdminItem)
+                                    .setVisible(result.getRole().isAdmin()));
+                }
+
+                @Override
+                public void onError(String errorMessage) { /* keep last known */ }
             });
         }
     }

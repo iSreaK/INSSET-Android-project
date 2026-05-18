@@ -18,6 +18,7 @@ import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.jvbench.R;
 import com.example.jvbench.core.navigation.NavConstants;
+import com.example.jvbench.core.theme.WindowInsetsHelper;
 import com.example.jvbench.di.App;
 import com.example.jvbench.ui.main.AppViewModelFactory;
 
@@ -46,6 +47,9 @@ public class ReviewFormFragment extends Fragment {
 
         App app = (App) requireActivity().getApplication();
         viewModel = new ViewModelProvider(this, new AppViewModelFactory(app.getAppContainer())).get(ReviewFormViewModel.class);
+
+        View content = view.findViewById(R.id.reviewFormContent);
+        if (content != null) WindowInsetsHelper.addBottomSystemInset(content);
 
         TextView titleText = view.findViewById(R.id.reviewFormTitle);
         EditText ratingInput = view.findViewById(R.id.reviewRatingInput);

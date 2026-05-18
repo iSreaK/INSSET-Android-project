@@ -12,6 +12,7 @@ import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.jvbench.R;
 import com.example.jvbench.core.theme.ThemePreferences;
+import com.example.jvbench.core.theme.WindowInsetsHelper;
 import com.example.jvbench.di.App;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.materialswitch.MaterialSwitch;
@@ -44,6 +45,7 @@ public class SettingsFragment extends Fragment {
         });
 
         BottomNavigationView bottomNavigationView = view.findViewById(R.id.settingsBottomNav);
+        WindowInsetsHelper.addBottomSystemInset(bottomNavigationView);
         com.example.jvbench.domain.model.User u = app.getAppContainer().authRepository.getCurrentUser();
         bottomNavigationView.getMenu().findItem(R.id.navAdminItem)
                 .setVisible(u != null && u.getRole().isAdmin());

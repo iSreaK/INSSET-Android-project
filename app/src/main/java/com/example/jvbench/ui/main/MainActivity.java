@@ -33,12 +33,12 @@ public class MainActivity extends AppCompatActivity {
         View root = findViewById(R.id.nav_host_fragment);
         ViewCompat.setOnApplyWindowInsetsListener(root, (v, insets) -> {
             Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            // Apply BOTH top (status bar) and bottom (nav bar / home pill)
-            // padding to the navigation host. Without the bottom padding,
-            // screens that don't have their own BottomNavigationView (bench
-            // detail, forms, etc.) end up rendering content under the system
-            // navigation bar — buttons get covered.
-            v.setPadding(bars.left, bars.top, bars.right, bars.bottom);
+            // Only consume top inset (status bar) here; each fragment is in
+            // charge of applying the BOTTOM inset on the right child (the
+            // BottomNavigationView for screens that have one, or the
+            // ScrollView / RecyclerView for the others). We return the
+            // unmodified insets so children still see the bottom value.
+            v.setPadding(bars.left, bars.top, bars.right, 0);
             return insets;
         });
         ViewCompat.requestApplyInsets(root);

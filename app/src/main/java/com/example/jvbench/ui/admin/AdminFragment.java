@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.jvbench.R;
+import com.example.jvbench.core.theme.WindowInsetsHelper;
 import com.example.jvbench.di.App;
 import com.example.jvbench.domain.model.User;
 import com.example.jvbench.ui.main.AppViewModelFactory;
@@ -89,6 +90,7 @@ public class AdminFragment extends Fragment {
         });
 
         BottomNavigationView nav = view.findViewById(R.id.adminBottomNav);
+        WindowInsetsHelper.addBottomSystemInset(nav);
         nav.getMenu().findItem(R.id.navAdminItem).setVisible(true);
         nav.setSelectedItemId(R.id.navAdminItem);
         nav.setOnItemSelectedListener(item -> {

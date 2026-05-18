@@ -16,6 +16,7 @@ import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.jvbench.R;
 import com.example.jvbench.core.common.ResultCallback;
+import com.example.jvbench.core.theme.WindowInsetsHelper;
 import com.example.jvbench.di.App;
 import com.example.jvbench.ui.main.AppViewModelFactory;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -54,6 +55,7 @@ public class AccountFragment extends Fragment {
                 NavHostFragment.findNavController(this).navigate(R.id.action_accountFragment_to_myBenchesFragment));
 
         BottomNavigationView bottomNavigationView = view.findViewById(R.id.accountBottomNav);
+        WindowInsetsHelper.addBottomSystemInset(bottomNavigationView);
         bottomNavigationView.setSelectedItemId(R.id.navAccountItem);
         bottomNavigationView.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
