@@ -78,6 +78,7 @@ public class BenchDetailFragment extends Fragment {
         TextView descriptionText = view.findViewById(R.id.benchDetailDescriptionText);
         TextView authorText = view.findViewById(R.id.benchDetailAuthorText);
         TextView coordinatesText = view.findViewById(R.id.benchDetailCoordinatesText);
+        TextView distanceText = view.findViewById(R.id.benchDetailDistanceText);
         TextView ratingBigText = view.findViewById(R.id.benchDetailRatingBig);
         ratingCirclesRow = view.findViewById(R.id.ratingCirclesRow);
         ImageView imageView = view.findViewById(R.id.benchDetailImage);
@@ -180,6 +181,20 @@ public class BenchDetailFragment extends Fragment {
             coordinatesText.setText(getString(R.string.coordinates_format, bench.getLatitude(), bench.getLongitude()));
             ratingBigText.setText(getString(R.string.bench_rating_big_format, bench.getAverageRating()));
             paintRatingCircles((int) Math.round(bench.getAverageRating()));
+
+            // Distance row: visible only once we have a fix, formatted in m
+            // under 1 km and in km with 1 decimal beyond.
+            if (Double.isNaN(state.distanceMeters)) {
+                distanceText.setVisibility(View.GONE);
+            } else if (state.distanceMeters < 1000d) {
+                distanceText.setText(getString(R.string.nearby_distance_meters,
+                        (int) Math.round(state.distanceMeters)));
+                distanceText.setVisibility(View.VISIBLE);
+            } else {
+                distanceText.setText(getString(R.string.nearby_distance_kilometers,
+                        state.distanceMeters / 1000d));
+                distanceText.setVisibility(View.VISIBLE);
+            }
 
             if (state.authorUsername != null && !state.authorUsername.isBlank()) {
                 authorText.setText(getString(R.string.bench_author_format, state.authorUsername));
