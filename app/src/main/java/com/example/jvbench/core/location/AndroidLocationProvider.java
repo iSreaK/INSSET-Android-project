@@ -18,10 +18,12 @@ public class AndroidLocationProvider implements LocationProvider {
     @SuppressLint("MissingPermission")
     @Override
     public void getLastKnownLocation(ResultCallback<GeoPoint> callback) {
+        // No hardcoded fallback: surface "no fix" as an error so the caller can
+        // decide what to do (typically: keep France-wide view).
         fusedLocationClient.getLastLocation()
                 .addOnSuccessListener(location -> {
                     if (location == null) {
-                        callback.onSuccess(new GeoPoint(49.8941, 2.2958));
+                        callback.onError("no_fix");
                         return;
                     }
                     callback.onSuccess(new GeoPoint(location.getLatitude(), location.getLongitude()));
