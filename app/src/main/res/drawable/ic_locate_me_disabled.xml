@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Same shape as ic_locate_me but in grayscale to denote a disabled state. -->
+    <path
+        android:fillColor="#BDBDBD"
+        android:pathData="M24,24 m-22,0 a22,22 0 1,0 44,0 a22,22 0 1,0 -44,0 z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:fillAlpha="0.25"
+        android:pathData="M24,24 m-15,0 a15,15 0 1,0 30,0 a15,15 0 1,0 -30,0 z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M22.5,5 L25.5,5 L25.5,11 L22.5,11 Z
+                          M22.5,37 L25.5,37 L25.5,43 L22.5,43 Z
+                          M5,22.5 L11,22.5 L11,25.5 L5,25.5 Z
+                          M37,22.5 L43,22.5 L43,25.5 L37,25.5 Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M24,24 m-4,0 a4,4 0 1,0 8,0 a4,4 0 1,0 -8,0 z" />
+</vector>

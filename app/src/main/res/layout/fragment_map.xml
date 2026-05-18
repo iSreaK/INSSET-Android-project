@@ -52,7 +52,7 @@
             android:contentDescription="@string/locate_me"
             android:elevation="4dp"
             android:scaleType="fitCenter"
-            android:src="@drawable/ic_compass" />
+            android:src="@drawable/ic_locate_me" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/nearbyFab"

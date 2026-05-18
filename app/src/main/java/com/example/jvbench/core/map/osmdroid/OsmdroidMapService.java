@@ -52,6 +52,11 @@ public class OsmdroidMapService implements MapService {
     private static final long LONG_PRESS_TIMEOUT_MS = 1000L;
     private static final int CLUSTER_RADIUS_DP = 120;
     private static final int CLUSTER_ICON_PX = 96;
+    /** On-screen size of an individual bench pin (in pixels at xxhdpi-ish density). */
+    private static final int BENCH_MARKER_WIDTH_PX = 64;
+    private static final int BENCH_MARKER_HEIGHT_PX = 90;
+    /** Size of the "you are here" dot drawn by MyLocationNewOverlay. */
+    private static final int USER_DOT_PX = 56;
 
     @Nullable
     private MapView mapView;
@@ -143,6 +148,21 @@ public class OsmdroidMapService implements MapService {
         if (myLocationOverlay == null) {
             myLocationOverlay = new MyLocationNewOverlay(
                     new GpsMyLocationProvider(mapView.getContext()), mapView);
+            // Replace osmdroid's default "person" sprite by our brand-coloured
+            // dot. The directional arrow (used when the device has a compass
+            // bearing) is replaced by the same dot so the user sees a
+            // consistent visual whether or not the bearing is known.
+            Bitmap dot = drawableToBitmap(mapView.getContext(),
+                    R.drawable.ic_user_location_dot, USER_DOT_PX, USER_DOT_PX);
+            if (dot != null) {
+                myLocationOverlay.setPersonIcon(dot);
+                myLocationOverlay.setDirectionIcon(dot);
+                // Anchor the dot on its own centre rather than the default
+                // bottom-left of the person sprite, otherwise the marker is
+                // visually offset from the real GPS position.
+                myLocationOverlay.setPersonAnchor(0.5f, 0.5f);
+                myLocationOverlay.setDirectionAnchor(0.5f, 0.5f);
+            }
             myLocationOverlay.enableMyLocation();
             mapView.getOverlays().add(myLocationOverlay);
         }
@@ -187,12 +207,25 @@ public class OsmdroidMapService implements MapService {
         clusterer.getTextPaint().setTextSize(36f);
         clusterer.getTextPaint().setColor(0xFFFFFFFF);
 
+        // Build the bench-pin drawable once and reuse it on every marker;
+        // osmdroid's default green-hand sprite is replaced by our brand pin.
+        Drawable benchPin = ContextCompat.getDrawable(mapView.getContext(), R.drawable.ic_bench_marker);
+        if (benchPin != null) {
+            benchPin.setBounds(0, 0, BENCH_MARKER_WIDTH_PX, BENCH_MARKER_HEIGHT_PX);
+        }
+
         for (MapMarker model : markers) {
             Marker marker = new Marker(mapView);
             marker.setPosition(toOsm(model.getPosition()));
             marker.setTitle(model.getTitle());
             if (model.getSnippet() != null) {
                 marker.setSnippet(model.getSnippet());
+            }
+            if (benchPin != null) {
+                marker.setIcon(benchPin);
+                // Anchor on the bottom-centre tip of the pin so the visual
+                // point lines up with the actual coordinates.
+                marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
             }
             marker.setOnMarkerClickListener((clicked, mv) -> {
                 if (markerListener != null) {
