@@ -16,12 +16,23 @@
 
     <string name="add_bench">Ajouter un banc</string>
     <string name="bench_form_title">Nouveau banc</string>
+    <string name="create_bench_title">Nouveau banc</string>
+    <string name="edit_bench_title">Modifier le banc</string>
     <string name="bench_name">Nom du banc</string>
     <string name="bench_description">Description</string>
     <string name="bench_image_url">Image URL</string>
+    <string name="pick_image">Choisir une image</string>
     <string name="latitude">Latitude</string>
     <string name="longitude">Longitude</string>
     <string name="save_bench">Enregistrer le banc</string>
+    <string name="action_edit">Modifier</string>
+    <string name="action_delete">Supprimer</string>
+    <string name="confirm_delete_title">Supprimer ce banc ?</string>
+    <string name="confirm_delete_message">Cette action est irreversible.</string>
+    <string name="my_benches_title">Mes bancs</string>
+    <string name="my_benches_empty">Vous n avez pas encore ajoute de banc.</string>
+    <string name="error_image_upload">Erreur lors de l upload de l image.</string>
+    <string name="error_image_read">Impossible de lire l image selectionnee.</string>
     <string name="add_review">Ajouter un avis</string>
     <string name="rating_out_of_10">Note (0-10)</string>
     <string name="review_comment">Commentaire</string>

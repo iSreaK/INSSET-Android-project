@@ -1,40 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="24dp">
+    android:background="@color/jv_light_gray"
+    android:fillViewport="true">
 
-    <TextView
-        android:id="@+id/benchDetailNameText"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="24sp"
-        android:textStyle="bold" />
+        android:orientation="vertical"
+        android:padding="24dp">
 
-    <TextView
-        android:id="@+id/benchDetailDescriptionText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp" />
+        <TextView
+            android:id="@+id/benchDetailNameText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/jv_text_on_dark"
+            android:textSize="24sp"
+            android:textStyle="bold" />
 
-    <TextView
-        android:id="@+id/benchDetailCoordinatesText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp" />
+        <TextView
+            android:id="@+id/benchDetailDescriptionText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:textColor="@color/jv_text_on_dark" />
 
-    <TextView
-        android:id="@+id/benchDetailMetaText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp" />
+        <TextView
+            android:id="@+id/benchDetailCoordinatesText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:textColor="@color/jv_input_hint" />
 
-    <Button
-        android:id="@+id/goReviewFormButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="@string/add_review" />
+        <TextView
+            android:id="@+id/benchDetailMetaText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:textColor="@color/jv_input_hint" />
 
-</LinearLayout>
+        <Button
+            android:id="@+id/goReviewFormButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:backgroundTint="@color/jv_orange"
+            android:text="@string/add_review"
+            android:textColor="@color/jv_text_on_orange" />
+
+        <Button
+            android:id="@+id/editBenchButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:backgroundTint="@android:color/white"
+            android:text="@string/action_edit"
+            android:textColor="@color/jv_dark_blue"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/deleteBenchButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:backgroundTint="@color/jv_error_red"
+            android:text="@string/action_delete"
+            android:textColor="@color/jv_text_on_orange"
+            android:visibility="gone" />
+
+    </LinearLayout>
+</ScrollView>

@@ -42,6 +42,9 @@ public final class BenchMapper {
 
     public static JSONObject toInsertJson(Bench bench) throws JSONException {
         JSONObject json = new JSONObject();
+        if (bench.getId() != null && !bench.getId().isBlank()) {
+            json.put("id", bench.getId());
+        }
         json.put("name", bench.getName());
         json.put("description", bench.getDescription());
         json.put("latitude", bench.getLatitude());

@@ -11,6 +11,7 @@ import com.example.jvbench.ui.account.AccountViewModel;
 import com.example.jvbench.ui.benchdetail.BenchDetailViewModel;
 import com.example.jvbench.ui.benchform.BenchFormViewModel;
 import com.example.jvbench.ui.map.MapViewModel;
+import com.example.jvbench.ui.mybenches.MyBenchesViewModel;
 import com.example.jvbench.ui.reviewform.ReviewFormViewModel;
 
 public class AppViewModelFactory implements ViewModelProvider.Factory {
@@ -37,10 +38,13 @@ public class AppViewModelFactory implements ViewModelProvider.Factory {
             return (T) new MapViewModel(container.benchRepository, container.locationProvider);
         }
         if (modelClass.isAssignableFrom(BenchFormViewModel.class)) {
-            return (T) new BenchFormViewModel(container.benchRepository, container.authRepository);
+            return (T) new BenchFormViewModel(container.benchRepository, container.benchImageRepository, container.authRepository);
         }
         if (modelClass.isAssignableFrom(BenchDetailViewModel.class)) {
-            return (T) new BenchDetailViewModel(container.benchRepository);
+            return (T) new BenchDetailViewModel(container.benchRepository, container.benchImageRepository);
+        }
+        if (modelClass.isAssignableFrom(MyBenchesViewModel.class)) {
+            return (T) new MyBenchesViewModel(container.benchRepository, container.authRepository);
         }
         if (modelClass.isAssignableFrom(ReviewFormViewModel.class)) {
             return (T) new ReviewFormViewModel(container.reviewRepository, container.authRepository);

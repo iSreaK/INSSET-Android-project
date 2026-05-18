@@ -36,6 +36,44 @@ public class SupabaseApiClient {
         return execute("DELETE", absoluteUrl, null, requiresAuth, null);
     }
 
+    public SupabaseResponse uploadBinary(String absoluteUrl, byte[] body, String contentType, boolean requiresAuth, boolean upsert) {
+        if (!provider.isConfigured()) {
+            return SupabaseResponse.failure(0, null, "Supabase is not configured. Set SUPABASE_URL and SUPABASE_ANON_KEY.");
+        }
+        if (requiresAuth && !sessionStore.isAuthenticated()) {
+            return SupabaseResponse.failure(401, null, "User is not authenticated.");
+        }
+
+        MediaType mediaType = MediaType.parse(contentType == null || contentType.isBlank() ? "application/octet-stream" : contentType);
+        RequestBody requestBody = RequestBody.create(body == null ? new byte[0] : body, mediaType);
+
+        Request.Builder builder = new Request.Builder()
+                .url(absoluteUrl)
+                .addHeader("apikey", provider.getAnonKey());
+
+        String bearer = sessionStore.isAuthenticated() ? sessionStore.getAccessToken() : provider.getAnonKey();
+        builder.addHeader("Authorization", "Bearer " + bearer);
+
+        if (upsert) {
+            builder.addHeader("x-upsert", "true");
+        }
+
+        builder.post(requestBody);
+
+        try (Response response = provider.getHttpClient().newCall(builder.build()).execute()) {
+            String responseBody = response.body() != null ? response.body().string() : "";
+            if (response.isSuccessful()) {
+                return SupabaseResponse.success(response.code(), responseBody);
+            }
+            String error = responseBody != null && !responseBody.isBlank()
+                    ? responseBody
+                    : "Supabase error code " + response.code();
+            return SupabaseResponse.failure(response.code(), responseBody, error);
+        } catch (IOException exception) {
+            return SupabaseResponse.failure(0, null, exception.getMessage());
+        }
+    }
+
     public SupabaseResponse post(String absoluteUrl, JSONObject payload, boolean requiresAuth, String preferHeader) {
         return execute("POST", absoluteUrl, payload, requiresAuth, preferHeader);
     }

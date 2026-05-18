@@ -196,10 +196,19 @@
                 </com.google.android.material.card.MaterialCardView>
 
                 <Button
-                    android:id="@+id/accountSignOutButton"
+                    android:id="@+id/accountMyBenchesButton"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
+                    android:backgroundTint="@color/jv_orange"
+                    android:text="@string/my_benches_title"
+                    android:textColor="@color/jv_text_on_orange" />
+
+                <Button
+                    android:id="@+id/accountSignOutButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
                     android:backgroundTint="@android:color/white"
                     android:text="@string/sign_out"
                     android:textColor="@color/jv_dark_blue" />

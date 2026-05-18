@@ -1,5 +1,6 @@
 package com.example.jvbench.ui.benchdetail;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +18,7 @@ import com.example.jvbench.core.navigation.NavConstants;
 import com.example.jvbench.di.App;
 import com.example.jvbench.domain.model.Bench;
 import com.example.jvbench.domain.model.User;
+import com.example.jvbench.domain.model.UserRole;
 import com.example.jvbench.ui.main.AppViewModelFactory;
 
 public class BenchDetailFragment extends Fragment {
@@ -39,9 +41,13 @@ public class BenchDetailFragment extends Fragment {
         TextView coordinatesText = view.findViewById(R.id.benchDetailCoordinatesText);
         TextView metaText = view.findViewById(R.id.benchDetailMetaText);
         View addReviewButton = view.findViewById(R.id.goReviewFormButton);
+        View editButton = view.findViewById(R.id.editBenchButton);
+        View deleteButton = view.findViewById(R.id.deleteBenchButton);
 
         User currentUser = app.getAppContainer().authRepository.getCurrentUser();
         addReviewButton.setVisibility(currentUser == null ? View.GONE : View.VISIBLE);
+        editButton.setVisibility(View.GONE);
+        deleteButton.setVisibility(View.GONE);
 
         String benchId = getArguments() != null ? getArguments().getString(NavConstants.ARG_BENCH_ID) : null;
         if (benchId == null || benchId.isBlank()) {
@@ -55,8 +61,25 @@ public class BenchDetailFragment extends Fragment {
             NavHostFragment.findNavController(this).navigate(R.id.action_benchDetailFragment_to_reviewFormFragment, args);
         });
 
+        editButton.setOnClickListener(v -> {
+            Bundle args = new Bundle();
+            args.putString(NavConstants.ARG_BENCH_ID, benchId);
+            NavHostFragment.findNavController(this).navigate(R.id.action_benchDetailFragment_to_benchFormFragment, args);
+        });
+
+        deleteButton.setOnClickListener(v -> new AlertDialog.Builder(requireContext())
+                .setTitle(R.string.confirm_delete_title)
+                .setMessage(R.string.confirm_delete_message)
+                .setPositiveButton(R.string.action_delete, (dialog, which) -> viewModel.deleteBench())
+                .setNegativeButton(android.R.string.cancel, null)
+                .show());
+
         viewModel.getUiState().observe(getViewLifecycleOwner(), state -> {
             if (state == null) {
+                return;
+            }
+            if (state.deleted) {
+                NavHostFragment.findNavController(this).navigateUp();
                 return;
             }
             if (state.loading) {
@@ -76,6 +99,11 @@ public class BenchDetailFragment extends Fragment {
             descriptionText.setText(bench.getDescription());
             coordinatesText.setText(getString(R.string.coordinates_format, bench.getLatitude(), bench.getLongitude()));
             metaText.setText(getString(R.string.bench_meta_format, bench.getAverageRating(), bench.getReviewCount()));
+
+            boolean canEdit = currentUser != null
+                    && (currentUser.getId().equals(bench.getAuthorId()) || currentUser.getRole() == UserRole.ADMIN);
+            editButton.setVisibility(canEdit ? View.VISIBLE : View.GONE);
+            deleteButton.setVisibility(canEdit ? View.VISIBLE : View.GONE);
         });
 
         viewModel.loadBench(benchId);
