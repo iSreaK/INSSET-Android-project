@@ -9,6 +9,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -22,6 +23,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.bumptech.glide.Glide;
 import com.example.jvbench.R;
 import com.example.jvbench.core.navigation.NavConstants;
+import com.example.jvbench.core.network.NetworkMonitor;
 import com.example.jvbench.core.theme.WindowInsetsHelper;
 import com.example.jvbench.data.remote.supabase.SupabaseRealtimeClient;
 import com.example.jvbench.di.App;
@@ -42,6 +44,16 @@ public class BenchDetailFragment extends Fragment {
     private Object reviewsSub;
     @Nullable
     private Object benchSub;
+    @Nullable
+    private NetworkMonitor networkMonitor;
+    @Nullable
+    private NetworkMonitor.Listener networkListener;
+    @Nullable
+    private Button addReviewButtonRef;
+    @Nullable
+    private View editButtonRef;
+    @Nullable
+    private View deleteButtonRef;
 
     @Nullable
     @Override
@@ -57,6 +69,7 @@ public class BenchDetailFragment extends Fragment {
         App app = (App) requireActivity().getApplication();
         viewModel = new ViewModelProvider(this, new AppViewModelFactory(app.getAppContainer())).get(BenchDetailViewModel.class);
         realtimeClient = app.getAppContainer().supabaseRealtimeClient;
+        networkMonitor = app.getAppContainer().networkMonitor;
 
         View content = view.findViewById(R.id.benchDetailContent);
         if (content != null) WindowInsetsHelper.addBottomSystemInset(content);
@@ -71,6 +84,9 @@ public class BenchDetailFragment extends Fragment {
         Button addReviewButton = view.findViewById(R.id.goReviewFormButton);
         View editButton = view.findViewById(R.id.editBenchButton);
         View deleteButton = view.findViewById(R.id.deleteBenchButton);
+        addReviewButtonRef = addReviewButton;
+        editButtonRef = editButton;
+        deleteButtonRef = deleteButton;
         View backButton = view.findViewById(R.id.backButton);
         TextView reviewsEmptyText = view.findViewById(R.id.reviewsEmptyText);
         RecyclerView reviewsRecycler = view.findViewById(R.id.reviewsRecycler);
@@ -117,23 +133,28 @@ public class BenchDetailFragment extends Fragment {
         }
 
         addReviewButton.setOnClickListener(v -> {
+            if (blockedWhenOffline()) return;
             Bundle args = new Bundle();
             args.putString(NavConstants.ARG_BENCH_ID, benchId);
             NavHostFragment.findNavController(this).navigate(R.id.action_benchDetailFragment_to_reviewFormFragment, args);
         });
 
         editButton.setOnClickListener(v -> {
+            if (blockedWhenOffline()) return;
             Bundle args = new Bundle();
             args.putString(NavConstants.ARG_BENCH_ID, benchId);
             NavHostFragment.findNavController(this).navigate(R.id.action_benchDetailFragment_to_benchFormFragment, args);
         });
 
-        deleteButton.setOnClickListener(v -> new AlertDialog.Builder(requireContext())
-                .setTitle(R.string.confirm_delete_title)
-                .setMessage(R.string.confirm_delete_message)
-                .setPositiveButton(R.string.action_delete, (dialog, which) -> viewModel.deleteBench())
-                .setNegativeButton(android.R.string.cancel, null)
-                .show());
+        deleteButton.setOnClickListener(v -> {
+            if (blockedWhenOffline()) return;
+            new AlertDialog.Builder(requireContext())
+                    .setTitle(R.string.confirm_delete_title)
+                    .setMessage(R.string.confirm_delete_message)
+                    .setPositiveButton(R.string.action_delete, (dialog, which) -> viewModel.deleteBench())
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .show();
+        });
 
         viewModel.getUiState().observe(getViewLifecycleOwner(), state -> {
             if (state == null) return;
@@ -257,6 +278,11 @@ public class BenchDetailFragment extends Fragment {
                 }
             });
         }
+
+        if (networkMonitor != null && networkListener == null) {
+            networkListener = this::applyOnlineState;
+            networkMonitor.addListener(networkListener);
+        }
     }
 
     @Override
@@ -265,6 +291,47 @@ public class BenchDetailFragment extends Fragment {
             if (reviewsSub != null) { realtimeClient.unsubscribe(reviewsSub); reviewsSub = null; }
             if (benchSub != null)   { realtimeClient.unsubscribe(benchSub);   benchSub = null; }
         }
+        if (networkMonitor != null && networkListener != null) {
+            networkMonitor.removeListener(networkListener);
+            networkListener = null;
+        }
         super.onPause();
+    }
+
+    @Override
+    public void onDestroyView() {
+        addReviewButtonRef = null;
+        editButtonRef = null;
+        deleteButtonRef = null;
+        super.onDestroyView();
+    }
+
+    /**
+     * Returns true (and shows a toast) when the device is offline and the
+     * action that triggered this call cannot proceed. Used as a guard inside
+     * click handlers so the user gets a clear hint instead of a Supabase
+     * timeout much later.
+     */
+    private boolean blockedWhenOffline() {
+        if (networkMonitor == null || networkMonitor.isOnline()) return false;
+        Toast.makeText(requireContext(), R.string.offline_action_blocked, Toast.LENGTH_SHORT).show();
+        return true;
+    }
+
+    /** Updates the visual state of network-dependent buttons. */
+    private void applyOnlineState(boolean online) {
+        float alpha = online ? 1f : 0.5f;
+        if (addReviewButtonRef != null) {
+            addReviewButtonRef.setEnabled(online);
+            addReviewButtonRef.setAlpha(alpha);
+        }
+        if (editButtonRef != null && editButtonRef.getVisibility() == View.VISIBLE) {
+            editButtonRef.setEnabled(online);
+            editButtonRef.setAlpha(alpha);
+        }
+        if (deleteButtonRef != null && deleteButtonRef.getVisibility() == View.VISIBLE) {
+            deleteButtonRef.setEnabled(online);
+            deleteButtonRef.setAlpha(alpha);
+        }
     }
 }

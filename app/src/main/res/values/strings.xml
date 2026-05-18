@@ -84,6 +84,8 @@
     <string name="locate_me_waiting">Recherche de votre position...</string>
     <string name="location_disabled_hint">Localisation desactivee. Active la dans les reglages Android.</string>
     <string name="map_long_press_hint">Maintiens un appui sur la carte pour ajouter un banc.</string>
+    <string name="offline_banner">Hors ligne — certaines actions sont indisponibles.</string>
+    <string name="offline_action_blocked">Action indisponible hors ligne.</string>
 
     <string name="reviews_section_title">Avis</string>
     <string name="reviews_empty">Aucun avis pour le moment.</string>

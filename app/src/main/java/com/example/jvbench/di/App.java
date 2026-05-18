@@ -14,6 +14,9 @@ public class App extends Application {
         themePreferences = new ThemePreferences(this);
         themePreferences.apply();
         appContainer = new AppContainer(this);
+        // Start the connectivity broadcast receiver for the whole process
+        // lifetime. The monitor is then queried/observed by UI screens.
+        appContainer.networkMonitor.start();
     }
 
     public AppContainer getAppContainer() {

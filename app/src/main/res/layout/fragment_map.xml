@@ -25,6 +25,20 @@
             android:textSize="13sp"
             android:visibility="gone" />
 
+        <TextView
+            android:id="@+id/offlineBanner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top"
+            android:background="#CC5A1E1E"
+            android:gravity="center"
+            android:padding="10dp"
+            android:text="@string/offline_banner"
+            android:textColor="@android:color/white"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+
         <ImageButton
             android:id="@+id/locateMeButton"
             android:layout_width="52dp"

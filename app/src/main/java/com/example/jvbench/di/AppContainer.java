@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.example.jvbench.core.location.AndroidLocationProvider;
 import com.example.jvbench.core.location.LocationProvider;
+import com.example.jvbench.core.network.NetworkMonitor;
 import com.example.jvbench.core.permissions.PermissionManager;
 import com.example.jvbench.data.remote.supabase.SupabaseApiClient;
 import com.example.jvbench.data.remote.supabase.SupabaseClientProvider;
@@ -32,6 +33,7 @@ public class AppContainer {
     public final AdminRepository adminRepository;
     public final LocationProvider locationProvider;
     public final PermissionManager permissionManager;
+    public final NetworkMonitor networkMonitor;
 
     public AppContainer(Context context) {
         supabaseClientProvider = new SupabaseClientProvider();
@@ -45,5 +47,6 @@ public class AppContainer {
         adminRepository = new SupabaseAdminRepository(supabaseClientProvider, supabaseApiClient);
         locationProvider = new AndroidLocationProvider(context);
         permissionManager = new PermissionManager();
+        networkMonitor = new NetworkMonitor(context);
     }
 }
