@@ -14,10 +14,6 @@
         android:roundIcon="@drawable/ic_app_logo"
         android:supportsRtl="true"
         android:theme="@style/Theme.JvBench">
-
-        <meta-data
-            android:name="preloaded_fonts"
-            android:resource="@array/preloaded_fonts" />
         <activity
             android:name=".ui.main.MainActivity"
             android:exported="true">
