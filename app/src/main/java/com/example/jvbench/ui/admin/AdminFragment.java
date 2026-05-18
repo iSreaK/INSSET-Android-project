@@ -109,9 +109,10 @@ public class AdminFragment extends Fragment {
             }
             return false;
         });
-        // Defer the highlight until layout: avoids a stale visual selection
-        // that can persist when the BottomNavigationView is freshly inflated.
-        nav.post(() -> nav.setSelectedItemId(R.id.navAdminItem));
+        // Synchronous so the right tab is highlighted from the very first
+        // frame; deferring with post() makes the previously-selected tab
+        // visually flicker for one frame.
+        nav.setSelectedItemId(R.id.navAdminItem);
 
         viewModel.load();
     }

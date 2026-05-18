@@ -79,7 +79,11 @@ public class AccountFragment extends Fragment {
             }
             return false;
         });
-        bottomNavigationView.post(() -> bottomNavigationView.setSelectedItemId(R.id.navAccountItem));
+        // Apply the visual selection synchronously: deferring it with post()
+        // would let the BottomNavigationView render one frame with its
+        // default selection (first item = Map), which the user perceives
+        // as the Map icon briefly "jumping".
+        bottomNavigationView.setSelectedItemId(R.id.navAccountItem);
         // Show the admin tab only for administrators. The cached current user
         // already has its role from the last loadCurrentUser() call; if it's
         // still null we leave the tab hidden — the observer below will refresh

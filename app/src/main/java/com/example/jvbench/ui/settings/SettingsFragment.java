@@ -66,9 +66,9 @@ public class SettingsFragment extends Fragment {
             }
             return false;
         });
-        // Apply the visual selection only after the BottomNavigationView is
-        // laid out — calling setSelectedItemId too early can leave the wrong
-        // tab highlighted.
-        bottomNavigationView.post(() -> bottomNavigationView.setSelectedItemId(R.id.navSettingsItem));
+        // Synchronous so the right tab is highlighted from the very first
+        // frame; deferring with post() makes the previously-selected tab
+        // visually flicker for one frame.
+        bottomNavigationView.setSelectedItemId(R.id.navSettingsItem);
     }
 }

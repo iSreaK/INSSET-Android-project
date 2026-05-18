@@ -63,8 +63,6 @@ public class MapFragment extends Fragment {
     private MapService mapService;
     private MapViewModel viewModel;
     private boolean loggedIn;
-    /** Becomes true the first time we animate the camera onto the user's real position. */
-    private boolean hasCenteredOnUser;
 
     @Nullable
     private BottomNavigationView bottomNavCache;
@@ -120,7 +118,15 @@ public class MapFragment extends Fragment {
                 new FrameLayout.LayoutParams(
                         FrameLayout.LayoutParams.MATCH_PARENT,
                         FrameLayout.LayoutParams.MATCH_PARENT));
-        mapService.setCenter(MapViewModel.FRANCE_CENTER, MapViewModel.FRANCE_ZOOM);
+        // Restore the camera state from the ViewModel if the user is coming
+        // back from another screen (e.g. bench detail). Otherwise centre on
+        // France until we learn the user's real position.
+        GeoPoint savedCenter = viewModel.getLastCameraCenter();
+        if (savedCenter != null) {
+            mapService.setCenter(savedCenter, viewModel.getLastCameraZoom());
+        } else {
+            mapService.setCenter(MapViewModel.FRANCE_CENTER, MapViewModel.FRANCE_ZOOM);
+        }
         mapService.setOnMarkerClickListener(marker -> {
             Object payload = marker.getPayload();
             if (payload instanceof Bench) {
@@ -202,7 +208,10 @@ public class MapFragment extends Fragment {
             }
             return false;
         });
-        bottomNavigationView.post(() -> bottomNavigationView.setSelectedItemId(R.id.navMapItem));
+        // Synchronous so the right tab is highlighted from the very first
+        // frame; deferring with post() makes the previously-selected tab
+        // visually flicker for one frame.
+        bottomNavigationView.setSelectedItemId(R.id.navMapItem);
 
         viewModel.getUiState().observe(getViewLifecycleOwner(), state -> {
             if (state == null) {
@@ -221,11 +230,12 @@ public class MapFragment extends Fragment {
             }
 
             // Only animate to the user's coordinates the *first* time we get
-            // a real fix. Subsequent updates (realtime bench refresh) must
-            // not snap the camera back from wherever the user has panned.
-            if (state.userLocationKnown && !hasCenteredOnUser) {
+            // a real fix in this ViewModel's lifetime. Subsequent updates
+            // (realtime bench refresh, view recreation after returning from
+            // bench detail) must not snap the camera back.
+            if (state.userLocationKnown && !viewModel.hasCenteredOnUser()) {
                 mapService.animateTo(state.center, MapViewModel.USER_ZOOM, USER_RECENTER_ANIM_MS);
-                hasCenteredOnUser = true;
+                viewModel.markCenteredOnUser();
             }
             renderMarkers(state.benches);
         });
@@ -269,7 +279,7 @@ public class MapFragment extends Fragment {
             GeoPoint loc = mapService.getUserLocation();
             if (loc != null) {
                 mapService.animateTo(loc, LOCATE_ME_ZOOM, 700L);
-                hasCenteredOnUser = true;
+                viewModel.markCenteredOnUser();
             } else {
                 Toast.makeText(requireContext(), R.string.locate_me_waiting, Toast.LENGTH_SHORT).show();
             }
@@ -408,6 +418,10 @@ public class MapFragment extends Fragment {
     @Override
     public void onDestroyView() {
         if (mapService != null) {
+            // Snapshot the camera before tearing the native view down so the
+            // next onViewCreated (e.g. on return from bench detail) can
+            // restore exactly where the user was looking.
+            viewModel.saveCameraState(mapService.getCameraCenter(), mapService.getCameraZoom());
             mapService.onDestroyView();
         }
         offlineBanner = null;
