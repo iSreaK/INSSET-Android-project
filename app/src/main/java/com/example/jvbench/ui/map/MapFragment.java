@@ -162,6 +162,8 @@ public class MapFragment extends Fragment {
         });
 
         BottomNavigationView bottomNavigationView = view.findViewById(R.id.mapBottomNav);
+        boolean isAdminUser = currentUser != null && currentUser.getRole().isAdmin();
+        bottomNavigationView.getMenu().findItem(R.id.navAdminItem).setVisible(isAdminUser);
         bottomNavigationView.setSelectedItemId(R.id.navMapItem);
         bottomNavigationView.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
@@ -174,6 +176,10 @@ public class MapFragment extends Fragment {
             }
             if (id == R.id.navSettingsItem) {
                 NavHostFragment.findNavController(this).navigate(R.id.action_mapFragment_to_settingsFragment);
+                return true;
+            }
+            if (id == R.id.navAdminItem) {
+                NavHostFragment.findNavController(this).navigate(R.id.action_mapFragment_to_adminFragment);
                 return true;
             }
             return false;

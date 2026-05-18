@@ -9,10 +9,12 @@ import com.example.jvbench.data.remote.supabase.SupabaseApiClient;
 import com.example.jvbench.data.remote.supabase.SupabaseClientProvider;
 import com.example.jvbench.data.remote.supabase.SupabaseRealtimeClient;
 import com.example.jvbench.data.remote.supabase.SupabaseSessionStore;
+import com.example.jvbench.data.repository.SupabaseAdminRepository;
 import com.example.jvbench.data.repository.SupabaseAuthRepository;
 import com.example.jvbench.data.repository.SupabaseBenchImageRepository;
 import com.example.jvbench.data.repository.SupabaseBenchRepository;
 import com.example.jvbench.data.repository.SupabaseReviewRepository;
+import com.example.jvbench.domain.repository.AdminRepository;
 import com.example.jvbench.domain.repository.AuthRepository;
 import com.example.jvbench.domain.repository.BenchImageRepository;
 import com.example.jvbench.domain.repository.BenchRepository;
@@ -27,6 +29,7 @@ public class AppContainer {
     public final BenchRepository benchRepository;
     public final BenchImageRepository benchImageRepository;
     public final ReviewRepository reviewRepository;
+    public final AdminRepository adminRepository;
     public final LocationProvider locationProvider;
     public final PermissionManager permissionManager;
 
@@ -39,6 +42,7 @@ public class AppContainer {
         benchRepository = new SupabaseBenchRepository(supabaseClientProvider, supabaseApiClient);
         benchImageRepository = new SupabaseBenchImageRepository(supabaseClientProvider, supabaseApiClient);
         reviewRepository = new SupabaseReviewRepository(supabaseClientProvider, supabaseApiClient);
+        adminRepository = new SupabaseAdminRepository(supabaseClientProvider, supabaseApiClient);
         locationProvider = new AndroidLocationProvider(context);
         permissionManager = new PermissionManager();
     }

@@ -7,7 +7,7 @@ create table if not exists public.profiles (
     id uuid primary key references auth.users (id) on delete cascade,
     email text not null unique,
     username text not null,
-    role text not null default 'USER' check (role in ('USER', 'ADMIN')),
+    role text not null default 'USER' check (role in ('USER', 'MODERATOR', 'ADMINISTRATOR')),
     created_at timestamptz not null default now()
 );
 
@@ -49,7 +49,7 @@ create index if not exists idx_benches_author_id on public.benches(author_id);
 create index if not exists idx_reviews_bench_id on public.reviews(bench_id);
 create index if not exists idx_reviews_user_id on public.reviews(user_id);
 
--- Simple helper for admin access checks in RLS policies.
+-- Helpers for role-based access checks in RLS policies.
 create or replace function public.is_admin()
 returns boolean
 language sql
@@ -61,7 +61,22 @@ as $$
         select 1
         from public.profiles p
         where p.id = auth.uid()
-          and p.role = 'ADMIN'
+          and p.role = 'ADMINISTRATOR'
+    );
+$$;
+
+create or replace function public.is_moderator_or_admin()
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+    select exists (
+        select 1
+        from public.profiles p
+        where p.id = auth.uid()
+          and p.role in ('MODERATOR', 'ADMINISTRATOR')
     );
 $$;
 
@@ -143,25 +158,42 @@ alter table public.benches enable row level security;
 alter table public.reviews enable row level security;
 
 -- PROFILES
+-- Public read so usernames of reviewers / bench authors are visible.
+-- Sensitive columns (email) are protected at the application layer by only
+-- selecting non-sensitive columns in PostgREST queries.
 drop policy if exists "profiles_select_self_or_admin" on public.profiles;
-create policy "profiles_select_self_or_admin"
+drop policy if exists "profiles_select_public_username" on public.profiles;
+create policy "profiles_select_public_username"
 on public.profiles for select
-using (auth.uid() = id or public.is_admin());
+using (true);
 
 drop policy if exists "profiles_insert_self" on public.profiles;
 create policy "profiles_insert_self"
 on public.profiles for insert
 with check (auth.uid() = id);
 
+-- A self-update can change anything EXCEPT the role.
+-- An admin can change the role of anyone WHO IS NOT ADMINISTRATOR (admins
+-- protect each other). Admin still cannot change their own role this way.
 drop policy if exists "profiles_update_self_or_admin" on public.profiles;
 create policy "profiles_update_self_or_admin"
 on public.profiles for update
-using (auth.uid() = id or public.is_admin())
-with check (
-    public.is_admin()
+using (
+    auth.uid() = id
     or (
+        public.is_admin()
+        and role <> 'ADMINISTRATOR'
+    )
+)
+with check (
+    (
         auth.uid() = id
         and role = (select p.role from public.profiles p where p.id = auth.uid())
+    )
+    or (
+        public.is_admin()
+        and role <> 'ADMINISTRATOR' -- still cannot promote without going through delete+recreate
+        and id <> auth.uid()
     )
 );
 
@@ -179,13 +211,13 @@ with check (auth.uid() is not null and auth.uid() = author_id);
 drop policy if exists "benches_update_owner_or_admin" on public.benches;
 create policy "benches_update_owner_or_admin"
 on public.benches for update
-using (author_id = auth.uid() or public.is_admin())
-with check (author_id = auth.uid() or public.is_admin());
+using (author_id = auth.uid() or public.is_moderator_or_admin())
+with check (author_id = auth.uid() or public.is_moderator_or_admin());
 
 drop policy if exists "benches_delete_owner_or_admin" on public.benches;
 create policy "benches_delete_owner_or_admin"
 on public.benches for delete
-using (author_id = auth.uid() or public.is_admin());
+using (author_id = auth.uid() or public.is_moderator_or_admin());
 
 -- REVIEWS
 drop policy if exists "reviews_read_all" on public.reviews;
@@ -201,13 +233,13 @@ with check (auth.uid() is not null and auth.uid() = user_id);
 drop policy if exists "reviews_update_author_or_admin" on public.reviews;
 create policy "reviews_update_author_or_admin"
 on public.reviews for update
-using (user_id = auth.uid() or public.is_admin())
-with check (user_id = auth.uid() or public.is_admin());
+using (user_id = auth.uid() or public.is_moderator_or_admin())
+with check (user_id = auth.uid() or public.is_moderator_or_admin());
 
 drop policy if exists "reviews_delete_author_or_admin" on public.reviews;
 create policy "reviews_delete_author_or_admin"
 on public.reviews for delete
-using (user_id = auth.uid() or public.is_admin());
+using (user_id = auth.uid() or public.is_moderator_or_admin());
 
 -- STORAGE
 insert into storage.buckets (id, name, public)
@@ -227,12 +259,48 @@ with check (bucket_id = 'bench-images' and auth.uid() is not null);
 drop policy if exists "bench_images_owner_or_admin_update" on storage.objects;
 create policy "bench_images_owner_or_admin_update"
 on storage.objects for update
-using (bucket_id = 'bench-images' and (owner = auth.uid() or public.is_admin()));
+using (bucket_id = 'bench-images' and (owner = auth.uid() or public.is_moderator_or_admin()));
 
 drop policy if exists "bench_images_owner_or_admin_delete" on storage.objects;
 create policy "bench_images_owner_or_admin_delete"
 on storage.objects for delete
-using (bucket_id = 'bench-images' and (owner = auth.uid() or public.is_admin()));
+using (bucket_id = 'bench-images' and (owner = auth.uid() or public.is_moderator_or_admin()));
 
 -- Recommended object path convention (app side):
 -- bench-images/<bench_id>/main.<ext>
+
+-- ADMIN RPC: delete a user (cascades to profile + benches + reviews + storage).
+-- An administrator cannot delete another administrator (peers protect each other).
+-- Returns the deleted user id on success, raises an exception otherwise.
+create or replace function public.admin_delete_user(p_user_id uuid)
+returns uuid
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+    caller_role text;
+    target_role text;
+begin
+    select role into caller_role from public.profiles where id = auth.uid();
+    if caller_role is null or caller_role <> 'ADMINISTRATOR' then
+        raise exception 'Only administrators can delete users';
+    end if;
+
+    if p_user_id = auth.uid() then
+        raise exception 'Administrators cannot delete themselves';
+    end if;
+
+    select role into target_role from public.profiles where id = p_user_id;
+    if target_role = 'ADMINISTRATOR' then
+        raise exception 'Cannot delete another administrator';
+    end if;
+
+    -- Cascade: deleting from auth.users drops profile (FK on delete cascade),
+    -- which drops benches/reviews via their own cascade FKs.
+    delete from auth.users where id = p_user_id;
+    return p_user_id;
+end;
+$$;
+
+grant execute on function public.admin_delete_user(uuid) to authenticated;

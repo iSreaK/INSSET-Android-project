@@ -16,7 +16,14 @@ public final class UserMapper {
         String username = json.optString("username", "");
         String roleRaw = json.optString("role", "USER");
         String createdAt = json.optString("created_at", null);
-        UserRole role = "ADMIN".equalsIgnoreCase(roleRaw) ? UserRole.ADMIN : UserRole.USER;
+        UserRole role;
+        if ("ADMINISTRATOR".equalsIgnoreCase(roleRaw)) {
+            role = UserRole.ADMINISTRATOR;
+        } else if ("MODERATOR".equalsIgnoreCase(roleRaw)) {
+            role = UserRole.MODERATOR;
+        } else {
+            role = UserRole.USER;
+        }
         return new User(id, email, username, role, createdAt);
     }
 }

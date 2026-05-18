@@ -25,6 +25,7 @@ public class ReviewsAdapter extends RecyclerView.Adapter<ReviewsAdapter.ReviewVi
     private final List<Review> items = new ArrayList<>();
     @Nullable
     private String currentUserId;
+    private boolean canModerate;
     @Nullable
     private final OnReviewActionListener listener;
 
@@ -34,6 +35,11 @@ public class ReviewsAdapter extends RecyclerView.Adapter<ReviewsAdapter.ReviewVi
 
     public void setCurrentUserId(@Nullable String currentUserId) {
         this.currentUserId = currentUserId;
+        notifyDataSetChanged();
+    }
+
+    public void setCanModerate(boolean canModerate) {
+        this.canModerate = canModerate;
         notifyDataSetChanged();
     }
 
@@ -69,7 +75,8 @@ public class ReviewsAdapter extends RecyclerView.Adapter<ReviewsAdapter.ReviewVi
         }
 
         boolean isOwn = currentUserId != null && currentUserId.equals(review.getUserId());
-        holder.deleteButton.setVisibility(isOwn ? View.VISIBLE : View.GONE);
+        boolean showDelete = isOwn || canModerate;
+        holder.deleteButton.setVisibility(showDelete ? View.VISIBLE : View.GONE);
         holder.deleteButton.setOnClickListener(v -> {
             if (listener != null) {
                 listener.onDeleteOwnReview(review);

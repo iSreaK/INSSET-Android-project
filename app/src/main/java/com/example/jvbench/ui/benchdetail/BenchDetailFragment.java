@@ -84,6 +84,7 @@ public class BenchDetailFragment extends Fragment {
                 .setNegativeButton(android.R.string.cancel, null)
                 .show());
         reviewsAdapter.setCurrentUserId(currentUser != null ? currentUser.getId() : null);
+        reviewsAdapter.setCanModerate(currentUser != null && currentUser.getRole().canModerate());
         reviewsRecycler.setLayoutManager(new LinearLayoutManager(requireContext()));
         reviewsRecycler.setAdapter(reviewsAdapter);
 
@@ -167,10 +168,14 @@ public class BenchDetailFragment extends Fragment {
                 Glide.with(this).load(imageUrl).centerCrop().into(imageView);
             }
 
-            boolean canEdit = currentUser != null
-                    && (currentUser.getId().equals(bench.getAuthorId()) || currentUser.getRole() == UserRole.ADMIN);
+            boolean isOwner = currentUser != null && currentUser.getId().equals(bench.getAuthorId());
+            boolean canModerate = currentUser != null && currentUser.getRole().canModerate();
+            // Edit only owner or admin (moderators don't rewrite content).
+            boolean canEdit = isOwner || (currentUser != null && currentUser.getRole().isAdmin());
+            // Delete owner OR any moderator/admin.
+            boolean canDelete = isOwner || canModerate;
             editButton.setVisibility(canEdit ? View.VISIBLE : View.GONE);
-            deleteButton.setVisibility(canEdit ? View.VISIBLE : View.GONE);
+            deleteButton.setVisibility(canDelete ? View.VISIBLE : View.GONE);
         });
 
         viewModel.getReviews().observe(getViewLifecycleOwner(), list -> {

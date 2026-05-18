@@ -68,8 +68,20 @@ public class AccountFragment extends Fragment {
                 NavHostFragment.findNavController(this).navigate(R.id.action_accountFragment_to_settingsFragment);
                 return true;
             }
+            if (id == R.id.navAdminItem) {
+                NavHostFragment.findNavController(this).navigate(R.id.action_accountFragment_to_adminFragment);
+                return true;
+            }
             return false;
         });
+        // Show the admin tab only for administrators. The cached current user
+        // already has its role from the last loadCurrentUser() call; if it's
+        // still null we leave the tab hidden — the observer below will refresh
+        // it when state.user lands.
+        com.example.jvbench.domain.model.User cachedUser =
+                app.getAppContainer().authRepository.getCurrentUser();
+        boolean cachedIsAdmin = cachedUser != null && cachedUser.getRole().isAdmin();
+        bottomNavigationView.getMenu().findItem(R.id.navAdminItem).setVisible(cachedIsAdmin);
 
         goLoginButton.setOnClickListener(v ->
                 NavHostFragment.findNavController(this).navigate(R.id.action_accountFragment_to_loginFragment));
@@ -131,6 +143,9 @@ public class AccountFragment extends Fragment {
             }
             saveUsernameButton.setEnabled(true);
             signOutButton.setEnabled(true);
+            // Toggle the admin tab whenever the user changes (login/logout).
+            bottomNavigationView.getMenu().findItem(R.id.navAdminItem).setVisible(
+                    state.user != null && state.user.getRole().isAdmin());
             if (state.user == null) {
                 statusText.setText(R.string.account_not_connected);
                 connectedBlock.setVisibility(View.GONE);

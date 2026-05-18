@@ -50,6 +50,9 @@
         <action
             android:id="@+id/action_mapFragment_to_settingsFragment"
             app:destination="@id/settingsFragment" />
+        <action
+            android:id="@+id/action_mapFragment_to_adminFragment"
+            app:destination="@id/adminFragment" />
     </fragment>
 
     <fragment
@@ -71,6 +74,9 @@
         <action
             android:id="@+id/action_accountFragment_to_settingsFragment"
             app:destination="@id/settingsFragment" />
+        <action
+            android:id="@+id/action_accountFragment_to_adminFragment"
+            app:destination="@id/adminFragment" />
     </fragment>
 
     <fragment
@@ -83,6 +89,24 @@
         <action
             android:id="@+id/action_settingsFragment_to_accountFragment"
             app:destination="@id/accountFragment" />
+        <action
+            android:id="@+id/action_settingsFragment_to_adminFragment"
+            app:destination="@id/adminFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/adminFragment"
+        android:name="com.example.jvbench.ui.admin.AdminFragment"
+        android:label="Admin">
+        <action
+            android:id="@+id/action_adminFragment_to_mapFragment"
+            app:destination="@id/mapFragment" />
+        <action
+            android:id="@+id/action_adminFragment_to_accountFragment"
+            app:destination="@id/accountFragment" />
+        <action
+            android:id="@+id/action_adminFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
     </fragment>
 
     <fragment

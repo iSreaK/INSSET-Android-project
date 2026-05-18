@@ -44,6 +44,9 @@ public class SettingsFragment extends Fragment {
         });
 
         BottomNavigationView bottomNavigationView = view.findViewById(R.id.settingsBottomNav);
+        com.example.jvbench.domain.model.User u = app.getAppContainer().authRepository.getCurrentUser();
+        bottomNavigationView.getMenu().findItem(R.id.navAdminItem)
+                .setVisible(u != null && u.getRole().isAdmin());
         bottomNavigationView.setSelectedItemId(R.id.navSettingsItem);
         bottomNavigationView.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
@@ -54,6 +57,10 @@ public class SettingsFragment extends Fragment {
             }
             if (id == R.id.navAccountItem) {
                 NavHostFragment.findNavController(this).navigate(R.id.action_settingsFragment_to_accountFragment);
+                return true;
+            }
+            if (id == R.id.navAdminItem) {
+                NavHostFragment.findNavController(this).navigate(R.id.action_settingsFragment_to_adminFragment);
                 return true;
             }
             return false;

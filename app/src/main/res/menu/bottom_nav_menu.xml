@@ -12,4 +12,9 @@
         android:id="@+id/navSettingsItem"
         android:icon="@drawable/ic_settings"
         android:title="@string/nav_settings" />
+    <item
+        android:id="@+id/navAdminItem"
+        android:icon="@drawable/ic_admin"
+        android:title="@string/nav_admin"
+        android:visible="false" />
 </menu>

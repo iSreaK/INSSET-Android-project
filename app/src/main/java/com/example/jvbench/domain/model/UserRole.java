@@ -2,5 +2,14 @@ package com.example.jvbench.domain.model;
 
 public enum UserRole {
     USER,
-    ADMIN
+    MODERATOR,
+    ADMINISTRATOR;
+
+    public boolean canModerate() {
+        return this == MODERATOR || this == ADMINISTRATOR;
+    }
+
+    public boolean isAdmin() {
+        return this == ADMINISTRATOR;
+    }
 }
