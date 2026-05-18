@@ -16,6 +16,6 @@
     <!-- text color on top of jv_card_background -->
     <color name="jv_text_on_card">#0B132B</color>
     <!-- bottom navigation bar -->
-    <color name="jv_bottom_nav_background">#0B132B</color>
-    <color name="jv_bottom_nav_item">#FFFFFF</color>
+    <color name="jv_bottom_nav_background">#FFFFFF</color>
+    <color name="jv_bottom_nav_item">#0B132B</color>
 </resources>

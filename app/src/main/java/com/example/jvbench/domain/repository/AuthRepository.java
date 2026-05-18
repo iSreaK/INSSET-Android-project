@@ -16,4 +16,6 @@ public interface AuthRepository {
     void loadCurrentUser(ResultCallback<User> callback);
 
     void updateUsername(String username, ResultCallback<User> callback);
+
+    void getUserById(String userId, ResultCallback<User> callback);
 }

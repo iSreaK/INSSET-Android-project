@@ -94,6 +94,14 @@
             android:defaultValue="@null"
             app:argType="string"
             app:nullable="true" />
+        <argument
+            android:name="prefilLat"
+            android:defaultValue="0.0"
+            app:argType="float" />
+        <argument
+            android:name="prefilLng"
+            android:defaultValue="0.0"
+            app:argType="float" />
     </fragment>
 
     <fragment

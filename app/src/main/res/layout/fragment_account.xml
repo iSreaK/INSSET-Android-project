@@ -221,9 +221,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
-        android:background="@color/jv_dark_blue"
-        app:itemIconTint="@android:color/white"
-        app:itemTextColor="@android:color/white"
+        android:background="@color/jv_bottom_nav_background"
+        app:itemIconTint="@color/jv_bottom_nav_item"
+        app:itemTextColor="@color/jv_bottom_nav_item"
         app:menu="@menu/bottom_nav_menu" />
 
 </LinearLayout>

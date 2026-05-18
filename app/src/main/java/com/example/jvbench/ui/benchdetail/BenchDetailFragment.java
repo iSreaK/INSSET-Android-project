@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -15,6 +16,7 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.jvbench.R;
 import com.example.jvbench.core.navigation.NavConstants;
 import com.example.jvbench.di.App;
@@ -43,8 +45,10 @@ public class BenchDetailFragment extends Fragment {
 
         TextView nameText = view.findViewById(R.id.benchDetailNameText);
         TextView descriptionText = view.findViewById(R.id.benchDetailDescriptionText);
+        TextView authorText = view.findViewById(R.id.benchDetailAuthorText);
         TextView coordinatesText = view.findViewById(R.id.benchDetailCoordinatesText);
         TextView metaText = view.findViewById(R.id.benchDetailMetaText);
+        ImageView imageView = view.findViewById(R.id.benchDetailImage);
         View addReviewButton = view.findViewById(R.id.goReviewFormButton);
         View editButton = view.findViewById(R.id.editBenchButton);
         View deleteButton = view.findViewById(R.id.deleteBenchButton);
@@ -114,6 +118,21 @@ public class BenchDetailFragment extends Fragment {
             coordinatesText.setText(getString(R.string.coordinates_format, bench.getLatitude(), bench.getLongitude()));
             metaText.setText(getString(R.string.bench_meta_format, bench.getAverageRating(), bench.getReviewCount()));
 
+            if (state.authorUsername != null && !state.authorUsername.isBlank()) {
+                authorText.setText(getString(R.string.bench_author_format, state.authorUsername));
+                authorText.setVisibility(View.VISIBLE);
+            } else {
+                authorText.setVisibility(View.GONE);
+            }
+
+            String imageUrl = bench.getImageUrl();
+            if (imageUrl != null && !imageUrl.isBlank()) {
+                imageView.setVisibility(View.VISIBLE);
+                Glide.with(this).load(imageUrl).centerCrop().into(imageView);
+            } else {
+                imageView.setVisibility(View.GONE);
+            }
+
             boolean canEdit = currentUser != null
                     && (currentUser.getId().equals(bench.getAuthorId()) || currentUser.getRole() == UserRole.ADMIN);
             editButton.setVisibility(canEdit ? View.VISIBLE : View.GONE);
@@ -137,7 +156,6 @@ public class BenchDetailFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        // Reload to reflect any review added/edited in the review form
         if (viewModel != null) {
             String benchId = getArguments() != null ? getArguments().getString(NavConstants.ARG_BENCH_ID) : null;
             if (benchId != null && !benchId.isBlank()) {

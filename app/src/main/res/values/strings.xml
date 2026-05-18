@@ -66,6 +66,9 @@
     <string name="settings_dark_mode">Mode sombre</string>
     <string name="settings_dark_mode_subtitle">Activer le theme sombre de l application</string>
 
+    <string name="bench_author_format">Ajoute par : %1$s</string>
+    <string name="map_long_press_hint">Maintiens un appui sur la carte pour ajouter un banc.</string>
+
     <string name="reviews_section_title">Avis</string>
     <string name="reviews_empty">Aucun avis pour le moment.</string>
     <string name="review_rating_format">Note : %1$d/10</string>

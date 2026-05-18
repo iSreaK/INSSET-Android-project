@@ -37,6 +37,15 @@
                 android:textStyle="bold" />
         </LinearLayout>
 
+        <ImageView
+            android:id="@+id/benchDetailImage"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_marginTop="16dp"
+            android:contentDescription="@string/bench_image_url"
+            android:scaleType="centerCrop"
+            android:visibility="gone" />
+
         <TextView
             android:id="@+id/benchDetailDescriptionText"
             android:layout_width="match_parent"
@@ -45,10 +54,17 @@
             android:textColor="@color/jv_text_on_dark" />
 
         <TextView
-            android:id="@+id/benchDetailCoordinatesText"
+            android:id="@+id/benchDetailAuthorText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
+            android:textColor="@color/jv_input_hint" />
+
+        <TextView
+            android:id="@+id/benchDetailCoordinatesText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
             android:textColor="@color/jv_input_hint" />
 
         <TextView

@@ -225,6 +225,33 @@ public class SupabaseAuthRepository implements AuthRepository {
         });
     }
 
+    @Override
+    public void getUserById(String userId, ResultCallback<User> callback) {
+        executor.execute(() -> {
+            if (userId == null || userId.isBlank()) {
+                callback.onError("User id is required.");
+                return;
+            }
+            String url = clientProvider.getRestBaseUrl()
+                    + "/profiles?select=id,email,username,role,created_at&id=eq." + userId + "&limit=1";
+            SupabaseResponse response = apiClient.get(url, false);
+            if (!response.isSuccessful()) {
+                callback.onError(response.getError());
+                return;
+            }
+            try {
+                JSONArray array = new JSONArray(response.getBody());
+                if (array.length() == 0) {
+                    callback.onError("Profil introuvable.");
+                    return;
+                }
+                callback.onSuccess(UserMapper.fromProfileJson(array.getJSONObject(0)));
+            } catch (JSONException exception) {
+                callback.onError(exception.getMessage());
+            }
+        });
+    }
+
     private User fetchProfileOrFail(String userId, String userEmail, String fallbackUsername) {
         String url = clientProvider.getRestBaseUrl()
                 + "/profiles?select=id,email,username,role,created_at&id=eq." + userId + "&limit=1";

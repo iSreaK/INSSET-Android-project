@@ -65,11 +65,21 @@ public class BenchFormFragment extends Fragment {
 
         backButton.setOnClickListener(v -> NavHostFragment.findNavController(this).navigateUp());
 
-        String benchId = getArguments() != null ? getArguments().getString(NavConstants.ARG_BENCH_ID) : null;
+        Bundle args = getArguments();
+        String benchId = args != null ? args.getString(NavConstants.ARG_BENCH_ID) : null;
         boolean editMode = benchId != null && !benchId.isBlank();
 
         titleText.setText(editMode ? R.string.edit_bench_title : R.string.create_bench_title);
         saveButton.setText(editMode ? R.string.action_edit : R.string.save_bench);
+
+        if (!editMode && args != null) {
+            float prefilLat = args.getFloat(NavConstants.ARG_PREFILL_LAT, 0f);
+            float prefilLng = args.getFloat(NavConstants.ARG_PREFILL_LNG, 0f);
+            if (prefilLat != 0f || prefilLng != 0f) {
+                latitudeInput.setText(String.valueOf(prefilLat));
+                longitudeInput.setText(String.valueOf(prefilLng));
+            }
+        }
 
         pickImageLauncher = registerForActivityResult(
                 new ActivityResultContracts.PickVisualMedia(),
