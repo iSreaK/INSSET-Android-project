@@ -3,6 +3,7 @@ package com.example.jvbench.ui.benchform;
 import android.Manifest;
 import android.content.ContentResolver;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
@@ -28,6 +29,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
 
+import com.bumptech.glide.Glide;
 import com.example.jvbench.R;
 import com.example.jvbench.core.navigation.NavConstants;
 import com.example.jvbench.di.App;
@@ -112,7 +114,9 @@ public class BenchFormFragment extends Fragment {
                     pickedImageUri = uri;
                     ContentResolver resolver = requireContext().getContentResolver();
                     pickedImageMime = resolver.getType(uri);
-                    imagePreview.setImageURI(uri);
+                    // Glide downsamples + caches, otherwise ImageView crashes
+                    // on full-res photos (e.g. 12Mpx -> 200MB bitmap).
+                    Glide.with(this).load(uri).centerCrop().into(imagePreview);
                     imagePreview.setVisibility(View.VISIBLE);
                     handleExifFromPickedImage(uri);
                 }
@@ -179,8 +183,10 @@ public class BenchFormFragment extends Fragment {
             byte[] imageBytes = null;
             String mime = null;
             if (pickedImageUri != null) {
-                imageBytes = readUriBytes(pickedImageUri);
-                mime = pickedImageMime != null ? pickedImageMime : "image/jpeg";
+                imageBytes = readUriBytesDownscaled(pickedImageUri);
+                // Force JPEG since we re-encode; the stored extension stays
+                // consistent with what SupabaseBenchImageRepository expects.
+                mime = "image/jpeg";
                 if (imageBytes == null) {
                     statusText.setText(R.string.error_image_read);
                     return;
@@ -271,23 +277,63 @@ public class BenchFormFragment extends Fragment {
         }
     }
 
+    /**
+     * Read the picked image, downscale it so its longest side is at most
+     * {@value #MAX_UPLOAD_SIZE_PX}px, and re-encode as JPEG. Without this a
+     * 12-30 Mpx phone photo would be uploaded raw (tens of MB) and would
+     * also crash any ImageView that tried to draw it (200+ MB bitmap).
+     */
+    private static final int MAX_UPLOAD_SIZE_PX = 1600;
+    private static final int JPEG_QUALITY = 85;
+
     @Nullable
-    private byte[] readUriBytes(@NonNull Uri uri) {
-        try (InputStream in = requireContext().getContentResolver().openInputStream(uri)) {
-            if (in == null) return null;
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            byte[] buf = new byte[8192];
-            int n;
-            while ((n = in.read(buf)) > 0) {
-                out.write(buf, 0, n);
+    private byte[] readUriBytesDownscaled(@NonNull Uri uri) {
+        ContentResolver resolver = requireContext().getContentResolver();
+        try {
+            // 1st pass: read bounds only to compute an efficient inSampleSize.
+            BitmapFactory.Options bounds = new BitmapFactory.Options();
+            bounds.inJustDecodeBounds = true;
+            try (InputStream in = resolver.openInputStream(uri)) {
+                if (in == null) return null;
+                BitmapFactory.decodeStream(in, null, bounds);
             }
-            byte[] raw = out.toByteArray();
-            // sanity: decode bounds to confirm it's an image; ignore the result, just validate.
+            if (bounds.outWidth <= 0 || bounds.outHeight <= 0) return null;
+
+            int longest = Math.max(bounds.outWidth, bounds.outHeight);
+            int sample = 1;
+            while (longest / (sample * 2) >= MAX_UPLOAD_SIZE_PX) {
+                sample *= 2;
+            }
+
+            // 2nd pass: actually decode with subsampling.
             BitmapFactory.Options opts = new BitmapFactory.Options();
-            opts.inJustDecodeBounds = true;
-            BitmapFactory.decodeByteArray(raw, 0, raw.length, opts);
-            if (opts.outWidth <= 0) return null;
-            return raw;
+            opts.inSampleSize = sample;
+            opts.inPreferredConfig = Bitmap.Config.ARGB_8888;
+            Bitmap decoded;
+            try (InputStream in = resolver.openInputStream(uri)) {
+                if (in == null) return null;
+                decoded = BitmapFactory.decodeStream(in, null, opts);
+            }
+            if (decoded == null) return null;
+
+            // Final fine-grained scale to make sure we hit the target size
+            // exactly even when inSampleSize only halves.
+            Bitmap scaled;
+            int w = decoded.getWidth();
+            int h = decoded.getHeight();
+            int longestActual = Math.max(w, h);
+            if (longestActual > MAX_UPLOAD_SIZE_PX) {
+                float ratio = MAX_UPLOAD_SIZE_PX / (float) longestActual;
+                scaled = Bitmap.createScaledBitmap(decoded, Math.round(w * ratio), Math.round(h * ratio), true);
+                if (scaled != decoded) decoded.recycle();
+            } else {
+                scaled = decoded;
+            }
+
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            scaled.compress(Bitmap.CompressFormat.JPEG, JPEG_QUALITY, out);
+            scaled.recycle();
+            return out.toByteArray();
         } catch (Exception e) {
             return null;
         }
