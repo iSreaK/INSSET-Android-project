@@ -2,6 +2,7 @@ package com.example.jvbench.di;
 
 import android.content.Context;
 
+import com.example.jvbench.core.geofence.GeofenceManager;
 import com.example.jvbench.core.location.AndroidLocationProvider;
 import com.example.jvbench.core.location.LocationProvider;
 import com.example.jvbench.core.network.NetworkMonitor;
@@ -34,6 +35,7 @@ public class AppContainer {
     public final LocationProvider locationProvider;
     public final PermissionManager permissionManager;
     public final NetworkMonitor networkMonitor;
+    public final GeofenceManager geofenceManager;
 
     public AppContainer(Context context) {
         supabaseClientProvider = new SupabaseClientProvider();
@@ -48,5 +50,6 @@ public class AppContainer {
         locationProvider = new AndroidLocationProvider(context);
         permissionManager = new PermissionManager();
         networkMonitor = new NetworkMonitor(context);
+        geofenceManager = new GeofenceManager(context);
     }
 }

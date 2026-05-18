@@ -99,6 +99,15 @@
     <string name="nearby_button_disabled_offline">Hors ligne — recherche indisponible.</string>
     <string name="nearby_button_disabled_no_perm">Active la localisation pour rechercher autour de toi.</string>
 
+    <string name="channel_navigation_name">Navigation vers un banc</string>
+    <string name="channel_navigation_desc">Notification persistante affichee pendant la marche vers un banc.</string>
+    <string name="channel_arrival_name">Arrivee a un banc</string>
+    <string name="channel_arrival_desc">Alertes quand vous arrivez pres d un banc cible.</string>
+    <string name="notif_navigation_title">Navigation jv-Bench</string>
+    <string name="notif_navigation_text">En route vers : %1$s</string>
+    <string name="notif_arrival_title">Vous etes arrive a : %1$s</string>
+    <string name="notif_arrival_text">N oubliez pas de laisser un avis.</string>
+
     <string name="reviews_section_title">Avis</string>
     <string name="reviews_empty">Aucun avis pour le moment.</string>
     <string name="review_rating_format">Note : %1$d/10</string>
