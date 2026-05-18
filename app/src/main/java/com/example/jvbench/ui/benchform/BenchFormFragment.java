@@ -132,7 +132,7 @@ public class BenchFormFragment extends Fragment {
             String latRaw = latitudeInput.getText().toString().trim();
             String lngRaw = longitudeInput.getText().toString().trim();
 
-            if (TextUtils.isEmpty(name) || TextUtils.isEmpty(description)
+            if (TextUtils.isEmpty(name)
                     || TextUtils.isEmpty(latRaw) || TextUtils.isEmpty(lngRaw)) {
                 statusText.setText(R.string.error_missing_bench_fields);
                 return;

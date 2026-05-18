@@ -19,7 +19,7 @@
     <string name="create_bench_title">Nouveau banc</string>
     <string name="edit_bench_title">Modifier le banc</string>
     <string name="bench_name">Nom du banc</string>
-    <string name="bench_description">Description</string>
+    <string name="bench_description">Description (facultatif)</string>
     <string name="bench_image_url">Image URL</string>
     <string name="pick_image">Choisir une image</string>
     <string name="latitude">Latitude</string>
@@ -51,7 +51,7 @@
     <string name="error_invalid_username">Le username doit contenir 3 a 20 caracteres (lettres, chiffres, underscore).</string>
     <string name="error_password_too_short">Le mot de passe doit contenir au moins 6 caracteres.</string>
     <string name="error_password_mismatch">Les mots de passe ne correspondent pas.</string>
-    <string name="error_missing_bench_fields">Veuillez completer les champs requis du banc.</string>
+    <string name="error_missing_bench_fields">Le nom et les coordonnees sont obligatoires.</string>
     <string name="error_invalid_coordinates">Les coordonnees sont invalides.</string>
     <string name="error_missing_bench_id">Identifiant du banc manquant.</string>
     <string name="error_bench_not_found">Banc introuvable.</string>
