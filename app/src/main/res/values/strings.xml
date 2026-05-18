@@ -22,6 +22,8 @@
     <string name="bench_description">Description (facultatif)</string>
     <string name="bench_image_url">Image URL</string>
     <string name="pick_image">Choisir une image</string>
+    <string name="use_photo_coords">Utiliser les coordonnees de la photo</string>
+    <string name="exif_coords_filled">Coordonnees lues depuis la photo.</string>
     <string name="latitude">Latitude</string>
     <string name="longitude">Longitude</string>
     <string name="save_bench">Enregistrer le banc</string>

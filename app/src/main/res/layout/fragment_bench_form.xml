@@ -126,6 +126,16 @@
             android:visibility="gone" />
 
         <Button
+            android:id="@+id/useExifCoordsButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:backgroundTint="@android:color/white"
+            android:text="@string/use_photo_coords"
+            android:textColor="@color/jv_dark_blue"
+            android:visibility="gone" />
+
+        <Button
             android:id="@+id/saveBenchButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
