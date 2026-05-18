@@ -10,6 +10,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,7 +20,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.PickVisualMediaRequest;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -40,8 +40,10 @@ import java.io.InputStream;
 
 public class BenchFormFragment extends Fragment {
 
+    private static final String TAG = "BenchForm";
+
     private BenchFormViewModel viewModel;
-    private ActivityResultLauncher<PickVisualMediaRequest> pickImageLauncher;
+    private ActivityResultLauncher<String> pickImageLauncher;
     private ActivityResultLauncher<String> requestMediaLocationLauncher;
 
     private Uri pickedImageUri;
@@ -107,8 +109,10 @@ public class BenchFormFragment extends Fragment {
                 granted -> launchPicker()
         );
 
+        // GetContent gives a MediaStore URI on which MediaStore.setRequireOriginal()
+        // actually works; PickVisualMedia returns a sandboxed copy and strips EXIF.
         pickImageLauncher = registerForActivityResult(
-                new ActivityResultContracts.PickVisualMedia(),
+                new ActivityResultContracts.GetContent(),
                 uri -> {
                     if (uri == null) return;
                     pickedImageUri = uri;
@@ -219,9 +223,7 @@ public class BenchFormFragment extends Fragment {
     }
 
     private void launchPicker() {
-        pickImageLauncher.launch(new PickVisualMediaRequest.Builder()
-                .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
-                .build());
+        pickImageLauncher.launch("image/*");
     }
 
     /**
@@ -255,24 +257,36 @@ public class BenchFormFragment extends Fragment {
     @Nullable
     private double[] readExifLatLng(@NonNull Uri uri) {
         ContentResolver resolver = requireContext().getContentResolver();
-        // setRequireOriginal() on Android Q+ gives us the un-stripped EXIF if
-        // we have ACCESS_MEDIA_LOCATION. On older Android it's a no-op via
-        // try/catch fallback to the raw URI.
+        boolean hasMediaLocation = Build.VERSION.SDK_INT < Build.VERSION_CODES.Q
+                || ContextCompat.checkSelfPermission(requireContext(),
+                        Manifest.permission.ACCESS_MEDIA_LOCATION) == PackageManager.PERMISSION_GRANTED;
+        Log.d(TAG, "EXIF: uri=" + uri + " mediaLocPermission=" + hasMediaLocation);
+
         Uri exifUri = uri;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
-                && ContextCompat.checkSelfPermission(requireContext(),
-                        Manifest.permission.ACCESS_MEDIA_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && hasMediaLocation) {
             try {
                 exifUri = MediaStore.setRequireOriginal(uri);
-            } catch (Exception ignored) {
+                Log.d(TAG, "EXIF: setRequireOriginal -> " + exifUri);
+            } catch (Exception e) {
+                Log.w(TAG, "EXIF: setRequireOriginal failed: " + e.getMessage());
                 exifUri = uri;
             }
         }
         try (InputStream in = resolver.openInputStream(exifUri)) {
-            if (in == null) return null;
+            if (in == null) {
+                Log.w(TAG, "EXIF: openInputStream returned null");
+                return null;
+            }
             ExifInterface exif = new ExifInterface(in);
-            return exif.getLatLong();
+            double[] latLng = exif.getLatLong();
+            if (latLng == null) {
+                Log.d(TAG, "EXIF: no GPS tags in the image");
+            } else {
+                Log.d(TAG, "EXIF: lat=" + latLng[0] + " lng=" + latLng[1]);
+            }
+            return latLng;
         } catch (Exception e) {
+            Log.w(TAG, "EXIF: read failed: " + e.getMessage(), e);
             return null;
         }
     }
