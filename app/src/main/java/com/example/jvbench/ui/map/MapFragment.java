@@ -1,6 +1,8 @@
 package com.example.jvbench.ui.map;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
@@ -16,6 +18,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -45,6 +48,8 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
+import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
+import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 public class MapFragment extends Fragment {
     private static final long LONG_PRESS_TIMEOUT_MS = 1000L;
@@ -58,6 +63,10 @@ public class MapFragment extends Fragment {
     private SupabaseRealtimeClient realtimeClient;
     @Nullable
     private Object benchesRealtimeSub;
+    @Nullable
+    private MyLocationNewOverlay myLocationOverlay;
+    @Nullable
+    private ImageButton locateMeButton;
 
     private final Handler longPressHandler = new Handler(Looper.getMainLooper());
     @Nullable
@@ -192,6 +201,49 @@ public class MapFragment extends Fragment {
         });
 
         viewModel.loadMapData();
+
+        // Compass / locate-me button (top-right of the map)
+        locateMeButton = view.findViewById(R.id.locateMeButton);
+        setupLocationOverlay();
+    }
+
+    private void setupLocationOverlay() {
+        if (locateMeButton == null) return;
+        boolean hasPermission = hasLocationPermission();
+        locateMeButton.setEnabled(hasPermission);
+        locateMeButton.setImageResource(hasPermission
+                ? R.drawable.ic_my_location
+                : R.drawable.ic_my_location_disabled);
+        locateMeButton.setAlpha(hasPermission ? 1f : 0.6f);
+
+        if (!hasPermission) {
+            locateMeButton.setOnClickListener(v ->
+                    Toast.makeText(requireContext(), R.string.location_disabled_hint, Toast.LENGTH_SHORT).show());
+            return;
+        }
+
+        // Add the my-location overlay (user dot + accuracy circle) once
+        if (myLocationOverlay == null) {
+            myLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(requireContext()), mapView);
+            myLocationOverlay.enableMyLocation();
+            mapView.getOverlays().add(myLocationOverlay);
+        }
+
+        locateMeButton.setOnClickListener(v -> {
+            if (myLocationOverlay == null) return;
+            GeoPoint loc = myLocationOverlay.getMyLocation();
+            if (loc != null) {
+                mapView.getController().animateTo(loc);
+                mapView.getController().setZoom(16.0);
+            } else {
+                Toast.makeText(requireContext(), R.string.locate_me_waiting, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private boolean hasLocationPermission() {
+        return ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                || ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
 
     private void cancelLongPress() {
@@ -299,6 +351,12 @@ public class MapFragment extends Fragment {
         if (mapView != null) {
             mapView.onResume();
         }
+        if (myLocationOverlay != null) {
+            myLocationOverlay.enableMyLocation();
+        } else if (hasLocationPermission()) {
+            // Permission may have been granted while we were paused
+            setupLocationOverlay();
+        }
         if (realtimeClient != null && benchesRealtimeSub == null) {
             benchesRealtimeSub = realtimeClient.subscribeTable("public", "benches", (eventType, record) -> {
                 if (viewModel != null) {
@@ -312,6 +370,9 @@ public class MapFragment extends Fragment {
     public void onPause() {
         if (mapView != null) {
             mapView.onPause();
+        }
+        if (myLocationOverlay != null) {
+            myLocationOverlay.disableMyLocation();
         }
         cancelLongPress();
         if (realtimeClient != null && benchesRealtimeSub != null) {

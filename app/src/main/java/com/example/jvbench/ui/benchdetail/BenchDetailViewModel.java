@@ -107,6 +107,21 @@ public class BenchDetailViewModel extends ViewModel {
         });
     }
 
+    public void deleteReview(String reviewId, String benchId) {
+        reviewRepository.deleteReview(reviewId, new ResultCallback<Void>() {
+            @Override
+            public void onSuccess(Void result) {
+                loadReviews(benchId);
+                loadBench(benchId); // refresh average rating
+            }
+
+            @Override
+            public void onError(String errorMessage) {
+                // ignore; user can retry
+            }
+        });
+    }
+
     public void deleteBench() {
         UiState current = uiState.getValue();
         if (current == null || current.bench == null) {

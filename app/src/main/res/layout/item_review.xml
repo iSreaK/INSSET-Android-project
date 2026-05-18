@@ -61,5 +61,16 @@
                 android:textColor="@color/jv_text_on_dark"
                 android:textSize="13sp" />
         </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/itemReviewDelete"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginStart="8dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/delete_review"
+            android:src="@drawable/ic_trash"
+            android:visibility="gone"
+            app:tint="@color/jv_error_red" />
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

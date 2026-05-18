@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -16,6 +17,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.bumptech.glide.Glide;
 import com.example.jvbench.R;
@@ -62,27 +64,48 @@ public class BenchDetailFragment extends Fragment {
         TextView ratingBigText = view.findViewById(R.id.benchDetailRatingBig);
         ratingCirclesRow = view.findViewById(R.id.ratingCirclesRow);
         ImageView imageView = view.findViewById(R.id.benchDetailImage);
-        View addReviewButton = view.findViewById(R.id.goReviewFormButton);
+        Button addReviewButton = view.findViewById(R.id.goReviewFormButton);
         View editButton = view.findViewById(R.id.editBenchButton);
         View deleteButton = view.findViewById(R.id.deleteBenchButton);
         View backButton = view.findViewById(R.id.backButton);
         TextView reviewsEmptyText = view.findViewById(R.id.reviewsEmptyText);
         RecyclerView reviewsRecycler = view.findViewById(R.id.reviewsRecycler);
+        SwipeRefreshLayout swipeRefresh = view.findViewById(R.id.benchDetailSwipeRefresh);
 
-        ReviewsAdapter reviewsAdapter = new ReviewsAdapter();
+        final String benchIdFinal = getArguments() != null ? getArguments().getString(NavConstants.ARG_BENCH_ID) : null;
+
+        User currentUser = app.getAppContainer().authRepository.getCurrentUser();
+        ReviewsAdapter reviewsAdapter = new ReviewsAdapter(review -> new AlertDialog.Builder(requireContext())
+                .setTitle(R.string.confirm_delete_review_title)
+                .setMessage(R.string.confirm_delete_message)
+                .setPositiveButton(R.string.action_delete, (d, w) -> {
+                    if (benchIdFinal != null) viewModel.deleteReview(review.getId(), benchIdFinal);
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show());
+        reviewsAdapter.setCurrentUserId(currentUser != null ? currentUser.getId() : null);
         reviewsRecycler.setLayoutManager(new LinearLayoutManager(requireContext()));
         reviewsRecycler.setAdapter(reviewsAdapter);
+
+        if (swipeRefresh != null) {
+            swipeRefresh.setOnRefreshListener(() -> {
+                if (benchIdFinal != null) {
+                    viewModel.loadBench(benchIdFinal);
+                    viewModel.loadReviews(benchIdFinal);
+                }
+                swipeRefresh.setRefreshing(false);
+            });
+        }
 
         buildRatingCircles();
 
         backButton.setOnClickListener(v -> NavHostFragment.findNavController(this).navigateUp());
 
-        User currentUser = app.getAppContainer().authRepository.getCurrentUser();
         addReviewButton.setVisibility(currentUser == null ? View.GONE : View.VISIBLE);
         editButton.setVisibility(View.GONE);
         deleteButton.setVisibility(View.GONE);
 
-        String benchId = getArguments() != null ? getArguments().getString(NavConstants.ARG_BENCH_ID) : null;
+        String benchId = benchIdFinal;
         if (benchId == null || benchId.isBlank()) {
             nameText.setText(R.string.error_missing_bench_id);
             return;
@@ -159,6 +182,18 @@ public class BenchDetailFragment extends Fragment {
                 reviewsRecycler.setVisibility(View.VISIBLE);
                 reviewsAdapter.submit(list);
             }
+
+            // Adapt the CTA: "Modifier votre avis" if user already posted one
+            boolean userHasReview = false;
+            if (currentUser != null && list != null) {
+                for (com.example.jvbench.domain.model.Review r : list) {
+                    if (currentUser.getId().equals(r.getUserId())) {
+                        userHasReview = true;
+                        break;
+                    }
+                }
+            }
+            addReviewButton.setText(userHasReview ? R.string.edit_my_review : R.string.add_review);
         });
 
         viewModel.loadBench(benchId);

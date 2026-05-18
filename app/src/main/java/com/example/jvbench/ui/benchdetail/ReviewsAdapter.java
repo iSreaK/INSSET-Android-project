@@ -3,9 +3,11 @@ package com.example.jvbench.ui.benchdetail;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.jvbench.R;
@@ -16,7 +18,24 @@ import java.util.List;
 
 public class ReviewsAdapter extends RecyclerView.Adapter<ReviewsAdapter.ReviewViewHolder> {
 
+    public interface OnReviewActionListener {
+        void onDeleteOwnReview(Review review);
+    }
+
     private final List<Review> items = new ArrayList<>();
+    @Nullable
+    private String currentUserId;
+    @Nullable
+    private final OnReviewActionListener listener;
+
+    public ReviewsAdapter(@Nullable OnReviewActionListener listener) {
+        this.listener = listener;
+    }
+
+    public void setCurrentUserId(@Nullable String currentUserId) {
+        this.currentUserId = currentUserId;
+        notifyDataSetChanged();
+    }
 
     public void submit(List<Review> data) {
         items.clear();
@@ -48,6 +67,14 @@ public class ReviewsAdapter extends RecyclerView.Adapter<ReviewsAdapter.ReviewVi
             holder.commentText.setVisibility(View.VISIBLE);
             holder.commentText.setText(review.getComment());
         }
+
+        boolean isOwn = currentUserId != null && currentUserId.equals(review.getUserId());
+        holder.deleteButton.setVisibility(isOwn ? View.VISIBLE : View.GONE);
+        holder.deleteButton.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onDeleteOwnReview(review);
+            }
+        });
     }
 
     @Override
@@ -59,12 +86,14 @@ public class ReviewsAdapter extends RecyclerView.Adapter<ReviewsAdapter.ReviewVi
         final TextView authorText;
         final TextView ratingText;
         final TextView commentText;
+        final ImageButton deleteButton;
 
         ReviewViewHolder(@NonNull View itemView) {
             super(itemView);
             authorText = itemView.findViewById(R.id.itemReviewAuthor);
             ratingText = itemView.findViewById(R.id.itemReviewRating);
             commentText = itemView.findViewById(R.id.itemReviewComment);
+            deleteButton = itemView.findViewById(R.id.itemReviewDelete);
         }
     }
 }

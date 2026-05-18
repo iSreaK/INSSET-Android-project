@@ -34,6 +34,7 @@
     <string name="error_image_upload">Erreur lors de l upload de l image.</string>
     <string name="error_image_read">Impossible de lire l image selectionnee.</string>
     <string name="add_review">Ajouter un avis</string>
+    <string name="edit_my_review">Modifier votre avis</string>
     <string name="rating_out_of_10">Note (0-10)</string>
     <string name="review_comment">Commentaire</string>
     <string name="save_review">Enregistrer un avis</string>
@@ -69,6 +70,9 @@
 
     <string name="bench_author_format">Ajoute par : %1$s</string>
     <string name="action_view_more">Voir plus</string>
+    <string name="locate_me">Me localiser</string>
+    <string name="locate_me_waiting">Recherche de votre position...</string>
+    <string name="location_disabled_hint">Localisation desactivee. Active la dans les reglages Android.</string>
     <string name="map_long_press_hint">Maintiens un appui sur la carte pour ajouter un banc.</string>
 
     <string name="reviews_section_title">Avis</string>
