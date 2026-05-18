@@ -88,6 +88,56 @@ before update on public.reviews
 for each row
 execute function public.set_updated_at();
 
+-- Recompute average_rating and review_count on benches whenever the
+-- corresponding reviews change. Uses SECURITY DEFINER so the trigger can
+-- update benches even when the caller does not own them (e.g. a user
+-- posts a review on a bench they did not create).
+create or replace function public.refresh_bench_stats(p_bench_id uuid)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+    update public.benches b
+    set average_rating = coalesce(s.avg_rating, 0),
+        review_count   = coalesce(s.cnt, 0)
+    from (
+        select avg(rating)::numeric(4,2) as avg_rating, count(*) as cnt
+        from public.reviews
+        where bench_id = p_bench_id
+    ) s
+    where b.id = p_bench_id;
+end;
+$$;
+
+create or replace function public.reviews_after_change()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+    if (tg_op = 'INSERT') then
+        perform public.refresh_bench_stats(new.bench_id);
+    elsif (tg_op = 'UPDATE') then
+        perform public.refresh_bench_stats(new.bench_id);
+        if (new.bench_id is distinct from old.bench_id) then
+            perform public.refresh_bench_stats(old.bench_id);
+        end if;
+    elsif (tg_op = 'DELETE') then
+        perform public.refresh_bench_stats(old.bench_id);
+    end if;
+    return null;
+end;
+$$;
+
+drop trigger if exists trg_reviews_after_change on public.reviews;
+create trigger trg_reviews_after_change
+after insert or update or delete on public.reviews
+for each row
+execute function public.reviews_after_change();
+
 alter table public.profiles enable row level security;
 alter table public.benches enable row level security;
 alter table public.reviews enable row level security;

@@ -212,9 +212,8 @@ public class MapFragment extends Fragment {
         boolean hasPermission = hasLocationPermission();
         locateMeButton.setEnabled(hasPermission);
         locateMeButton.setImageResource(hasPermission
-                ? R.drawable.ic_my_location
-                : R.drawable.ic_my_location_disabled);
-        locateMeButton.setAlpha(hasPermission ? 1f : 0.6f);
+                ? R.drawable.ic_compass
+                : R.drawable.ic_compass_disabled);
 
         if (!hasPermission) {
             locateMeButton.setOnClickListener(v ->
@@ -233,8 +232,9 @@ public class MapFragment extends Fragment {
             if (myLocationOverlay == null) return;
             GeoPoint loc = myLocationOverlay.getMyLocation();
             if (loc != null) {
-                mapView.getController().animateTo(loc);
-                mapView.getController().setZoom(16.0);
+                // Animate position AND zoom together in one ~700ms tween,
+                // so re-centering from a far zoom level is fluid (no snap).
+                mapView.getController().animateTo(loc, 16.0, 700L);
             } else {
                 Toast.makeText(requireContext(), R.string.locate_me_waiting, Toast.LENGTH_SHORT).show();
             }
@@ -351,12 +351,10 @@ public class MapFragment extends Fragment {
         if (mapView != null) {
             mapView.onResume();
         }
-        if (myLocationOverlay != null) {
-            myLocationOverlay.enableMyLocation();
-        } else if (hasLocationPermission()) {
-            // Permission may have been granted while we were paused
-            setupLocationOverlay();
-        }
+        // Note: myLocationOverlay is created fresh in setupLocationOverlay()
+        // each time onViewCreated runs, and nulled out in onDestroyView. We
+        // don't try to revive a stale overlay here — that caused a crash when
+        // navigating back to the map (provider was detached but ref kept).
         if (realtimeClient != null && benchesRealtimeSub == null) {
             benchesRealtimeSub = realtimeClient.subscribeTable("public", "benches", (eventType, record) -> {
                 if (viewModel != null) {
@@ -372,7 +370,11 @@ public class MapFragment extends Fragment {
             mapView.onPause();
         }
         if (myLocationOverlay != null) {
-            myLocationOverlay.disableMyLocation();
+            try {
+                myLocationOverlay.disableMyLocation();
+            } catch (Exception ignored) {
+                // Overlay may already be detached; safe to ignore
+            }
         }
         cancelLongPress();
         if (realtimeClient != null && benchesRealtimeSub != null) {
@@ -380,5 +382,20 @@ public class MapFragment extends Fragment {
             benchesRealtimeSub = null;
         }
         super.onPause();
+    }
+
+    @Override
+    public void onDestroyView() {
+        // Drop the overlay reference because the underlying MapView is gone;
+        // the next onCreateView will rebuild it from scratch.
+        if (myLocationOverlay != null) {
+            try {
+                myLocationOverlay.disableMyLocation();
+            } catch (Exception ignored) {
+            }
+            myLocationOverlay = null;
+        }
+        markerClusterer = null;
+        super.onDestroyView();
     }
 }

@@ -27,16 +27,15 @@
 
         <ImageButton
             android:id="@+id/locateMeButton"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
             android:layout_gravity="top|end"
             android:layout_margin="12dp"
-            android:background="@drawable/bg_compass_button"
+            android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/locate_me"
             android:elevation="4dp"
-            android:src="@drawable/ic_my_location_disabled"
-            android:scaleType="centerInside"
-            app:tint="@color/jv_text_on_orange" />
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_compass" />
 
         <Button
             android:id="@+id/goBenchFormButton"
