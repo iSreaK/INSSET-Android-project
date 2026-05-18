@@ -52,6 +52,35 @@ public class SupabaseBenchRepository implements BenchRepository {
     }
 
     @Override
+    public void getBenchesByAuthor(String authorId, ResultCallback<List<Bench>> callback) {
+        executor.execute(() -> {
+            if (authorId == null || authorId.isBlank()) {
+                callback.onError("Author id is required.");
+                return;
+            }
+            String url = clientProvider.getRestBaseUrl()
+                    + "/benches?select=id,name,description,latitude,longitude,image_url,author_id,average_rating,review_count,created_at"
+                    + "&author_id=eq." + authorId
+                    + "&order=created_at.desc";
+            SupabaseResponse response = apiClient.get(url, false);
+            if (!response.isSuccessful()) {
+                callback.onError(response.getError());
+                return;
+            }
+            try {
+                JSONArray array = new JSONArray(response.getBody());
+                List<Bench> benches = new ArrayList<>();
+                for (int index = 0; index < array.length(); index++) {
+                    benches.add(BenchMapper.toDomain(BenchMapper.fromJson(array.getJSONObject(index))));
+                }
+                callback.onSuccess(benches);
+            } catch (JSONException exception) {
+                callback.onError(exception.getMessage());
+            }
+        });
+    }
+
+    @Override
     public void getBenchById(String id, ResultCallback<Bench> callback) {
         executor.execute(() -> {
             String url = clientProvider.getRestBaseUrl()

@@ -8,6 +8,8 @@ import java.util.List;
 public interface BenchRepository {
     void getBenches(ResultCallback<List<Bench>> callback);
 
+    void getBenchesByAuthor(String authorId, ResultCallback<List<Bench>> callback);
+
     void getBenchById(String id, ResultCallback<Bench> callback);
 
     void createBench(Bench bench, ResultCallback<Void> callback);

@@ -48,6 +48,10 @@ public class AccountFragment extends Fragment {
         Button goLoginButton = view.findViewById(R.id.accountGoLoginButton);
         Button goRegisterButton = view.findViewById(R.id.accountGoRegisterButton);
         Button signOutButton = view.findViewById(R.id.accountSignOutButton);
+        Button myBenchesButton = view.findViewById(R.id.accountMyBenchesButton);
+
+        myBenchesButton.setOnClickListener(v ->
+                NavHostFragment.findNavController(this).navigate(R.id.action_accountFragment_to_myBenchesFragment));
 
         BottomNavigationView bottomNavigationView = view.findViewById(R.id.accountBottomNav);
         bottomNavigationView.setSelectedItemId(R.id.navAccountItem);

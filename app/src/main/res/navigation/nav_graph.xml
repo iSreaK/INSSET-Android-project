@@ -62,12 +62,21 @@
         <action
             android:id="@+id/action_accountFragment_to_registerFragment"
             app:destination="@id/registerFragment" />
+        <action
+            android:id="@+id/action_accountFragment_to_myBenchesFragment"
+            app:destination="@id/myBenchesFragment" />
     </fragment>
 
     <fragment
         android:id="@+id/benchFormFragment"
         android:name="com.example.jvbench.ui.benchform.BenchFormFragment"
-        android:label="Bench form" />
+        android:label="Bench form">
+        <argument
+            android:name="benchId"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
+    </fragment>
 
     <fragment
         android:id="@+id/benchDetailFragment"
@@ -76,9 +85,21 @@
         <action
             android:id="@+id/action_benchDetailFragment_to_reviewFormFragment"
             app:destination="@id/reviewFormFragment" />
+        <action
+            android:id="@+id/action_benchDetailFragment_to_benchFormFragment"
+            app:destination="@id/benchFormFragment" />
         <argument
             android:name="benchId"
             app:argType="string" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/myBenchesFragment"
+        android:name="com.example.jvbench.ui.mybenches.MyBenchesFragment"
+        android:label="Mes bancs">
+        <action
+            android:id="@+id/action_myBenchesFragment_to_benchDetailFragment"
+            app:destination="@id/benchDetailFragment" />
     </fragment>
 
     <fragment
