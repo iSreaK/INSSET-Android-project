@@ -141,6 +141,21 @@ public class OsmdroidMapService implements MapService {
         mapView.getController().animateTo(toOsm(target), zoom, durationMs);
     }
 
+    @Nullable
+    @Override
+    public GeoPoint getCameraCenter() {
+        if (mapView == null) return null;
+        org.osmdroid.api.IGeoPoint center = mapView.getMapCenter();
+        if (center == null) return null;
+        return new GeoPoint(center.getLatitude(), center.getLongitude());
+    }
+
+    @Override
+    public double getCameraZoom() {
+        if (mapView == null) return 0d;
+        return mapView.getZoomLevelDouble();
+    }
+
     @Override
     public void enableUserLocationOverlay() {
         if (mapView == null) return;

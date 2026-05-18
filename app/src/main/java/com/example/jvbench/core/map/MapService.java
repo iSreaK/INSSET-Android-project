@@ -66,6 +66,16 @@ public interface MapService {
     /** Animates to a position/zoom over the given duration. */
     void animateTo(@NonNull GeoPoint target, double zoom, long durationMs);
 
+    /**
+     * Current camera centre. {@code null} when the map has not been
+     * positioned yet (called before any {@code setCenter}/{@code animateTo}).
+     */
+    @Nullable
+    GeoPoint getCameraCenter();
+
+    /** Current camera zoom level. */
+    double getCameraZoom();
+
     // --- User location ------------------------------------------------------
 
     /** Enables the small "blue dot" overlay tracking the user's position. Requires location permission. */

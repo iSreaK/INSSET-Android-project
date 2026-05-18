@@ -55,6 +55,17 @@ public class MapViewModel extends ViewModel {
             new UiState(true, new ArrayList<>(), FRANCE_CENTER, null, false)
     );
 
+    /**
+     * Persistent camera state — kept in the ViewModel rather than the
+     * Fragment so that navigating to a bench detail and coming back does
+     * not reset the map to its default France-wide view.
+     */
+    @androidx.annotation.Nullable
+    private GeoPoint lastCameraCenter;
+    private double lastCameraZoom = FRANCE_ZOOM;
+    /** True once the camera has been animated onto the user's real position. */
+    private boolean hasCenteredOnUser;
+
     public MapViewModel(BenchRepository benchRepository, LocationProvider locationProvider) {
         this.benchRepository = benchRepository;
         this.locationProvider = locationProvider;
@@ -62,6 +73,33 @@ public class MapViewModel extends ViewModel {
 
     public LiveData<UiState> getUiState() {
         return uiState;
+    }
+
+    @androidx.annotation.Nullable
+    public GeoPoint getLastCameraCenter() {
+        return lastCameraCenter;
+    }
+
+    public double getLastCameraZoom() {
+        return lastCameraZoom;
+    }
+
+    public boolean hasCenteredOnUser() {
+        return hasCenteredOnUser;
+    }
+
+    public void markCenteredOnUser() {
+        this.hasCenteredOnUser = true;
+    }
+
+    /**
+     * Called by the Fragment when its view is about to be destroyed so the
+     * current camera state survives the trip to another screen.
+     */
+    public void saveCameraState(@androidx.annotation.Nullable GeoPoint center, double zoom) {
+        if (center == null) return;
+        this.lastCameraCenter = center;
+        this.lastCameraZoom = zoom;
     }
 
     public void loadMapData() {
