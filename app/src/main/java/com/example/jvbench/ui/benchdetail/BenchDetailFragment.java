@@ -12,6 +12,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.jvbench.R;
 import com.example.jvbench.core.navigation.NavConstants;
@@ -22,6 +24,9 @@ import com.example.jvbench.domain.model.UserRole;
 import com.example.jvbench.ui.main.AppViewModelFactory;
 
 public class BenchDetailFragment extends Fragment {
+
+    private BenchDetailViewModel viewModel;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -34,7 +39,7 @@ public class BenchDetailFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         App app = (App) requireActivity().getApplication();
-        BenchDetailViewModel viewModel = new ViewModelProvider(this, new AppViewModelFactory(app.getAppContainer())).get(BenchDetailViewModel.class);
+        viewModel = new ViewModelProvider(this, new AppViewModelFactory(app.getAppContainer())).get(BenchDetailViewModel.class);
 
         TextView nameText = view.findViewById(R.id.benchDetailNameText);
         TextView descriptionText = view.findViewById(R.id.benchDetailDescriptionText);
@@ -43,6 +48,15 @@ public class BenchDetailFragment extends Fragment {
         View addReviewButton = view.findViewById(R.id.goReviewFormButton);
         View editButton = view.findViewById(R.id.editBenchButton);
         View deleteButton = view.findViewById(R.id.deleteBenchButton);
+        View backButton = view.findViewById(R.id.backButton);
+        TextView reviewsEmptyText = view.findViewById(R.id.reviewsEmptyText);
+        RecyclerView reviewsRecycler = view.findViewById(R.id.reviewsRecycler);
+
+        ReviewsAdapter reviewsAdapter = new ReviewsAdapter();
+        reviewsRecycler.setLayoutManager(new LinearLayoutManager(requireContext()));
+        reviewsRecycler.setAdapter(reviewsAdapter);
+
+        backButton.setOnClickListener(v -> NavHostFragment.findNavController(this).navigateUp());
 
         User currentUser = app.getAppContainer().authRepository.getCurrentUser();
         addReviewButton.setVisibility(currentUser == null ? View.GONE : View.VISIBLE);
@@ -106,6 +120,29 @@ public class BenchDetailFragment extends Fragment {
             deleteButton.setVisibility(canEdit ? View.VISIBLE : View.GONE);
         });
 
+        viewModel.getReviews().observe(getViewLifecycleOwner(), list -> {
+            if (list == null || list.isEmpty()) {
+                reviewsEmptyText.setVisibility(View.VISIBLE);
+                reviewsRecycler.setVisibility(View.GONE);
+            } else {
+                reviewsEmptyText.setVisibility(View.GONE);
+                reviewsRecycler.setVisibility(View.VISIBLE);
+                reviewsAdapter.submit(list);
+            }
+        });
+
         viewModel.loadBench(benchId);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Reload to reflect any review added/edited in the review form
+        if (viewModel != null) {
+            String benchId = getArguments() != null ? getArguments().getString(NavConstants.ARG_BENCH_ID) : null;
+            if (benchId != null && !benchId.isBlank()) {
+                viewModel.loadReviews(benchId);
+            }
+        }
     }
 }

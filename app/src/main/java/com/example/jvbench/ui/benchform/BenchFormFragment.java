@@ -61,6 +61,9 @@ public class BenchFormFragment extends Fragment {
         Button saveButton = view.findViewById(R.id.saveBenchButton);
         Button pickImageButton = view.findViewById(R.id.pickImageButton);
         ImageView imagePreview = view.findViewById(R.id.benchImagePreview);
+        View backButton = view.findViewById(R.id.backButton);
+
+        backButton.setOnClickListener(v -> NavHostFragment.findNavController(this).navigateUp());
 
         String benchId = getArguments() != null ? getArguments().getString(NavConstants.ARG_BENCH_ID) : null;
         boolean editMode = benchId != null && !benchId.isBlank();

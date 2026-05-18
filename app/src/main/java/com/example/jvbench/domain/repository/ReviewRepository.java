@@ -8,6 +8,8 @@ import java.util.List;
 public interface ReviewRepository {
     void getReviewsForBench(String benchId, ResultCallback<List<Review>> callback);
 
+    void getReviewByUserAndBench(String userId, String benchId, ResultCallback<Review> callback);
+
     void addReview(Review review, ResultCallback<Void> callback);
 
     void updateReview(Review review, ResultCallback<Void> callback);

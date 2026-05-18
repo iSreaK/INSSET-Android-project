@@ -61,11 +61,16 @@ public class MapFragment extends Fragment {
         BottomNavigationView bottomNavigationView = view.findViewById(R.id.mapBottomNav);
         bottomNavigationView.setSelectedItemId(R.id.navMapItem);
         bottomNavigationView.setOnItemSelectedListener(item -> {
-            if (item.getItemId() == R.id.navMapItem) {
+            int id = item.getItemId();
+            if (id == R.id.navMapItem) {
                 return true;
             }
-            if (item.getItemId() == R.id.navAccountItem) {
+            if (id == R.id.navAccountItem) {
                 NavHostFragment.findNavController(this).navigate(R.id.action_mapFragment_to_accountFragment);
+                return true;
+            }
+            if (id == R.id.navSettingsItem) {
+                NavHostFragment.findNavController(this).navigate(R.id.action_mapFragment_to_settingsFragment);
                 return true;
             }
             return false;

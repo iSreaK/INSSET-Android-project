@@ -53,6 +53,36 @@ public class SupabaseReviewRepository implements ReviewRepository {
     }
 
     @Override
+    public void getReviewByUserAndBench(String userId, String benchId, ResultCallback<Review> callback) {
+        executor.execute(() -> {
+            if (userId == null || userId.isBlank() || benchId == null || benchId.isBlank()) {
+                callback.onError("user id and bench id are required.");
+                return;
+            }
+            String url = clientProvider.getRestBaseUrl()
+                    + "/reviews?select=id,bench_id,user_id,rating,comment,created_at"
+                    + "&user_id=eq." + userId
+                    + "&bench_id=eq." + benchId
+                    + "&limit=1";
+            SupabaseResponse response = apiClient.get(url, false);
+            if (!response.isSuccessful()) {
+                callback.onError(response.getError());
+                return;
+            }
+            try {
+                JSONArray array = new JSONArray(response.getBody());
+                if (array.length() == 0) {
+                    callback.onSuccess(null);
+                    return;
+                }
+                callback.onSuccess(ReviewMapper.toDomain(ReviewMapper.fromJson(array.getJSONObject(0))));
+            } catch (JSONException exception) {
+                callback.onError(exception.getMessage());
+            }
+        });
+    }
+
+    @Override
     public void addReview(Review review, ResultCallback<Void> callback) {
         executor.execute(() -> {
             if (review == null) {

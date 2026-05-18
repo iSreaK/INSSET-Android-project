@@ -40,6 +40,9 @@ public class MyBenchesFragment extends Fragment {
 
         TextView statusText = view.findViewById(R.id.myBenchesStatusText);
         RecyclerView recyclerView = view.findViewById(R.id.myBenchesRecycler);
+        View backButton = view.findViewById(R.id.backButton);
+
+        backButton.setOnClickListener(v -> NavHostFragment.findNavController(this).navigateUp());
 
         adapter = new MyBenchesAdapter(bench -> {
             Bundle args = new Bundle();

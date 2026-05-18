@@ -60,6 +60,18 @@
 
     <string name="nav_map">Carte</string>
     <string name="nav_account">Compte</string>
+    <string name="nav_settings">Reglages</string>
+
+    <string name="action_back">Retour</string>
+    <string name="settings_dark_mode">Mode sombre</string>
+    <string name="settings_dark_mode_subtitle">Activer le theme sombre de l application</string>
+
+    <string name="reviews_section_title">Avis</string>
+    <string name="reviews_empty">Aucun avis pour le moment.</string>
+    <string name="review_rating_format">Note : %1$d/10</string>
+    <string name="edit_review_title">Modifier mon avis</string>
+    <string name="delete_review">Supprimer mon avis</string>
+    <string name="confirm_delete_review_title">Supprimer cet avis ?</string>
 
     <string name="account_not_connected">Aucun compte connecte.</string>
     <string name="account_connected">Compte connecte.</string>

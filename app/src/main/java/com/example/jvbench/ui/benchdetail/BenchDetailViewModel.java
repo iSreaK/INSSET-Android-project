@@ -6,8 +6,13 @@ import androidx.lifecycle.ViewModel;
 
 import com.example.jvbench.core.common.ResultCallback;
 import com.example.jvbench.domain.model.Bench;
+import com.example.jvbench.domain.model.Review;
 import com.example.jvbench.domain.repository.BenchImageRepository;
 import com.example.jvbench.domain.repository.BenchRepository;
+import com.example.jvbench.domain.repository.ReviewRepository;
+
+import java.util.Collections;
+import java.util.List;
 
 public class BenchDetailViewModel extends ViewModel {
     public static class UiState {
@@ -26,15 +31,24 @@ public class BenchDetailViewModel extends ViewModel {
 
     private final BenchRepository benchRepository;
     private final BenchImageRepository benchImageRepository;
+    private final ReviewRepository reviewRepository;
     private final MutableLiveData<UiState> uiState = new MutableLiveData<>(new UiState(true, null, null, false));
+    private final MutableLiveData<List<Review>> reviews = new MutableLiveData<>(Collections.emptyList());
 
-    public BenchDetailViewModel(BenchRepository benchRepository, BenchImageRepository benchImageRepository) {
+    public BenchDetailViewModel(BenchRepository benchRepository,
+                                BenchImageRepository benchImageRepository,
+                                ReviewRepository reviewRepository) {
         this.benchRepository = benchRepository;
         this.benchImageRepository = benchImageRepository;
+        this.reviewRepository = reviewRepository;
     }
 
     public LiveData<UiState> getUiState() {
         return uiState;
+    }
+
+    public LiveData<List<Review>> getReviews() {
+        return reviews;
     }
 
     public void loadBench(String benchId) {
@@ -43,11 +57,26 @@ public class BenchDetailViewModel extends ViewModel {
             @Override
             public void onSuccess(Bench result) {
                 uiState.postValue(new UiState(false, result, null, false));
+                loadReviews(benchId);
             }
 
             @Override
             public void onError(String errorMessage) {
                 uiState.postValue(new UiState(false, null, errorMessage, false));
+            }
+        });
+    }
+
+    public void loadReviews(String benchId) {
+        reviewRepository.getReviewsForBench(benchId, new ResultCallback<List<Review>>() {
+            @Override
+            public void onSuccess(List<Review> result) {
+                reviews.postValue(result);
+            }
+
+            @Override
+            public void onError(String errorMessage) {
+                reviews.postValue(Collections.emptyList());
             }
         });
     }
@@ -64,7 +93,6 @@ public class BenchDetailViewModel extends ViewModel {
         benchRepository.deleteBench(bench.getId(), new ResultCallback<Void>() {
             @Override
             public void onSuccess(Void result) {
-                // best-effort image cleanup: try common extensions
                 benchImageRepository.deleteBenchImage(bench.getId(), "jpg", new ResultCallback<Void>() {
                     @Override
                     public void onSuccess(Void r) { /* ignore */ }

@@ -4,32 +4,30 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="8dp"
-    android:clickable="true"
-    android:focusable="true"
     app:cardBackgroundColor="@color/jv_card_background"
-    app:cardCornerRadius="12dp"
-    app:cardElevation="2dp">
+    app:cardCornerRadius="10dp"
+    app:cardElevation="1dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="14dp">
 
         <TextView
-            android:id="@+id/itemBenchName"
+            android:id="@+id/itemReviewRating"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/jv_text_on_dark"
-            android:textSize="16sp"
+            android:textColor="@color/jv_orange"
+            android:textSize="15sp"
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/itemBenchMeta"
+            android:id="@+id/itemReviewComment"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:textColor="@color/jv_input_hint"
-            android:textSize="13sp" />
+            android:textColor="@color/jv_text_on_dark"
+            android:textSize="14sp" />
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

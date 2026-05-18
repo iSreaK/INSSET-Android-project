@@ -1,45 +1,103 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="24dp">
+    android:background="@color/jv_light_gray"
+    android:fillViewport="true">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/add_review"
-        android:textSize="24sp"
-        android:textStyle="bold" />
-
-    <EditText
-        android:id="@+id/reviewRatingInput"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:hint="@string/rating_out_of_10"
-        android:inputType="number" />
+        android:orientation="vertical"
+        android:padding="24dp">
 
-    <EditText
-        android:id="@+id/reviewCommentInput"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:hint="@string/review_comment"
-        android:inputType="textMultiLine" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
-    <Button
-        android:id="@+id/saveReviewButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="@string/save_review" />
+            <ImageButton
+                android:id="@+id/backButton"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/action_back"
+                android:src="@drawable/ic_arrow_back"
+                app:tint="@color/jv_text_on_dark" />
 
-    <TextView
-        android:id="@+id/reviewFormStatusText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:textColor="#B00020" />
+            <TextView
+                android:id="@+id/reviewFormTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="@string/add_review"
+                android:textColor="@color/jv_text_on_dark"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+        </LinearLayout>
 
-</LinearLayout>
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:hint="@string/rating_out_of_10"
+            app:boxBackgroundMode="outline"
+            app:hintTextColor="@color/jv_input_hint">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/reviewRatingInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:textColor="@color/jv_text_on_dark"
+                android:textColorHint="@color/jv_input_hint" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:hint="@string/review_comment"
+            app:boxBackgroundMode="outline"
+            app:hintTextColor="@color/jv_input_hint">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/reviewCommentInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textMultiLine"
+                android:minLines="3"
+                android:textColor="@color/jv_text_on_dark"
+                android:textColorHint="@color/jv_input_hint" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <Button
+            android:id="@+id/saveReviewButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:backgroundTint="@color/jv_orange"
+            android:text="@string/save_review"
+            android:textColor="@color/jv_text_on_orange" />
+
+        <Button
+            android:id="@+id/deleteReviewButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:backgroundTint="@color/jv_error_red"
+            android:text="@string/delete_review"
+            android:textColor="@color/jv_text_on_orange"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/reviewFormStatusText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:textColor="@color/jv_error_red" />
+
+    </LinearLayout>
+</ScrollView>

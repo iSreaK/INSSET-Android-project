@@ -1,0 +1,15 @@
+<resources>
+    <!-- Dark mode -->
+    <color name="jv_orange">#FF5A00</color>
+    <color name="jv_dark_blue">#0B132B</color>
+    <color name="jv_light_gray">#0B132B</color>
+    <color name="jv_success_green">#00E676</color>
+    <color name="jv_text_on_orange">#FFFFFF</color>
+    <color name="jv_error_red">#CF6679</color>
+    <color name="jv_text_on_dark">#FFFFFF</color>
+    <color name="jv_input_hint">#B3FFFFFF</color>
+    <color name="jv_card_background">#15203E</color>
+    <color name="jv_text_on_card">#FFFFFF</color>
+    <color name="jv_bottom_nav_background">#0B132B</color>
+    <color name="jv_bottom_nav_item">#FFFFFF</color>
+</resources>

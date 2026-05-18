@@ -56,11 +56,16 @@ public class AccountFragment extends Fragment {
         BottomNavigationView bottomNavigationView = view.findViewById(R.id.accountBottomNav);
         bottomNavigationView.setSelectedItemId(R.id.navAccountItem);
         bottomNavigationView.setOnItemSelectedListener(item -> {
-            if (item.getItemId() == R.id.navAccountItem) {
+            int id = item.getItemId();
+            if (id == R.id.navAccountItem) {
                 return true;
             }
-            if (item.getItemId() == R.id.navMapItem) {
+            if (id == R.id.navMapItem) {
                 NavHostFragment.findNavController(this).navigate(R.id.action_accountFragment_to_mapFragment);
+                return true;
+            }
+            if (id == R.id.navSettingsItem) {
+                NavHostFragment.findNavController(this).navigate(R.id.action_accountFragment_to_settingsFragment);
                 return true;
             }
             return false;
