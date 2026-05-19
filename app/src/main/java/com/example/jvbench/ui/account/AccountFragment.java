@@ -16,11 +16,9 @@ import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.jvbench.R;
 import com.example.jvbench.core.common.ResultCallback;
-import com.example.jvbench.core.navigation.BottomNavBinder;
-import com.example.jvbench.core.theme.WindowInsetsHelper;
 import com.example.jvbench.di.App;
 import com.example.jvbench.ui.main.AppViewModelFactory;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.example.jvbench.ui.main.MainActivity;
 
 public class AccountFragment extends Fragment {
     private AccountViewModel viewModel;
@@ -54,17 +52,6 @@ public class AccountFragment extends Fragment {
 
         myBenchesButton.setOnClickListener(v ->
                 NavHostFragment.findNavController(this).navigate(R.id.action_accountFragment_to_myBenchesFragment));
-
-        BottomNavigationView bottomNavigationView = view.findViewById(R.id.accountBottomNav);
-        WindowInsetsHelper.addBottomSystemInset(bottomNavigationView);
-        // Show the admin tab only for administrators. The cached current user
-        // already has its role from the last loadCurrentUser() call; if it's
-        // still null we leave the tab hidden — the observer below will refresh
-        // it when state.user lands.
-        com.example.jvbench.domain.model.User cachedUser =
-                app.getAppContainer().authRepository.getCurrentUser();
-        boolean cachedIsAdmin = cachedUser != null && cachedUser.getRole().isAdmin();
-        BottomNavBinder.bind(bottomNavigationView, this, R.id.navAccountItem, cachedIsAdmin);
 
         goLoginButton.setOnClickListener(v ->
                 NavHostFragment.findNavController(this).navigate(R.id.action_accountFragment_to_loginFragment));
@@ -126,11 +113,10 @@ public class AccountFragment extends Fragment {
             }
             saveUsernameButton.setEnabled(true);
             signOutButton.setEnabled(true);
-            // Toggle the admin tab whenever the user changes (login/logout).
-            BottomNavBinder.updateAdminVisibility(
-                    bottomNavigationView,
-                    R.id.navAccountItem,
-                    state.user != null && state.user.getRole().isAdmin());
+            if (getActivity() instanceof MainActivity) {
+                ((MainActivity) getActivity()).setAdminTabVisible(
+                        state.user != null && state.user.getRole().isAdmin());
+            }
             if (state.user == null) {
                 statusText.setText(R.string.account_not_connected);
                 connectedBlock.setVisibility(View.GONE);
