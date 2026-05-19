@@ -16,6 +16,7 @@ import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.jvbench.R;
 import com.example.jvbench.core.common.ResultCallback;
+import com.example.jvbench.core.navigation.BottomNavBinder;
 import com.example.jvbench.core.theme.WindowInsetsHelper;
 import com.example.jvbench.di.App;
 import com.example.jvbench.ui.main.AppViewModelFactory;
@@ -56,34 +57,6 @@ public class AccountFragment extends Fragment {
 
         BottomNavigationView bottomNavigationView = view.findViewById(R.id.accountBottomNav);
         WindowInsetsHelper.addBottomSystemInset(bottomNavigationView);
-        // Wire the listener FIRST, then post the selection. Calling
-        // setSelectedItemId() before the BottomNavigationView is laid out can
-        // silently drop the highlight on some Material versions, which would
-        // leave the user looking at the wrong selected tab.
-        bottomNavigationView.setOnItemSelectedListener(item -> {
-            int id = item.getItemId();
-            if (id == R.id.navAccountItem) {
-                return true;
-            }
-            if (id == R.id.navMapItem) {
-                NavHostFragment.findNavController(this).navigate(R.id.action_accountFragment_to_mapFragment);
-                return true;
-            }
-            if (id == R.id.navSettingsItem) {
-                NavHostFragment.findNavController(this).navigate(R.id.action_accountFragment_to_settingsFragment);
-                return true;
-            }
-            if (id == R.id.navAdminItem) {
-                NavHostFragment.findNavController(this).navigate(R.id.action_accountFragment_to_adminFragment);
-                return true;
-            }
-            return false;
-        });
-        // Apply the visual selection synchronously: deferring it with post()
-        // would let the BottomNavigationView render one frame with its
-        // default selection (first item = Map), which the user perceives
-        // as the Map icon briefly "jumping".
-        bottomNavigationView.setSelectedItemId(R.id.navAccountItem);
         // Show the admin tab only for administrators. The cached current user
         // already has its role from the last loadCurrentUser() call; if it's
         // still null we leave the tab hidden — the observer below will refresh
@@ -91,7 +64,7 @@ public class AccountFragment extends Fragment {
         com.example.jvbench.domain.model.User cachedUser =
                 app.getAppContainer().authRepository.getCurrentUser();
         boolean cachedIsAdmin = cachedUser != null && cachedUser.getRole().isAdmin();
-        bottomNavigationView.getMenu().findItem(R.id.navAdminItem).setVisible(cachedIsAdmin);
+        BottomNavBinder.bind(bottomNavigationView, this, R.id.navAccountItem, cachedIsAdmin);
 
         goLoginButton.setOnClickListener(v ->
                 NavHostFragment.findNavController(this).navigate(R.id.action_accountFragment_to_loginFragment));
@@ -154,7 +127,9 @@ public class AccountFragment extends Fragment {
             saveUsernameButton.setEnabled(true);
             signOutButton.setEnabled(true);
             // Toggle the admin tab whenever the user changes (login/logout).
-            bottomNavigationView.getMenu().findItem(R.id.navAdminItem).setVisible(
+            BottomNavBinder.updateAdminVisibility(
+                    bottomNavigationView,
+                    R.id.navAccountItem,
                     state.user != null && state.user.getRole().isAdmin());
             if (state.user == null) {
                 statusText.setText(R.string.account_not_connected);

@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.jvbench.R;
+import com.example.jvbench.core.navigation.BottomNavBinder;
 import com.example.jvbench.core.theme.WindowInsetsHelper;
 import com.example.jvbench.di.App;
 import com.example.jvbench.domain.model.User;
@@ -91,28 +92,7 @@ public class AdminFragment extends Fragment {
 
         BottomNavigationView nav = view.findViewById(R.id.adminBottomNav);
         WindowInsetsHelper.addBottomSystemInset(nav);
-        nav.getMenu().findItem(R.id.navAdminItem).setVisible(true);
-        nav.setOnItemSelectedListener(item -> {
-            int id = item.getItemId();
-            if (id == R.id.navAdminItem) return true;
-            if (id == R.id.navMapItem) {
-                NavHostFragment.findNavController(this).navigate(R.id.action_adminFragment_to_mapFragment);
-                return true;
-            }
-            if (id == R.id.navAccountItem) {
-                NavHostFragment.findNavController(this).navigate(R.id.action_adminFragment_to_accountFragment);
-                return true;
-            }
-            if (id == R.id.navSettingsItem) {
-                NavHostFragment.findNavController(this).navigate(R.id.action_adminFragment_to_settingsFragment);
-                return true;
-            }
-            return false;
-        });
-        // Synchronous so the right tab is highlighted from the very first
-        // frame; deferring with post() makes the previously-selected tab
-        // visually flicker for one frame.
-        nav.setSelectedItemId(R.id.navAdminItem);
+        BottomNavBinder.bind(nav, this, R.id.navAdminItem, true);
 
         viewModel.load();
     }

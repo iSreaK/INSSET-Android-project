@@ -17,7 +17,9 @@
     <color name="jv_text_on_card">#0B132B</color>
     <!-- bottom navigation bar -->
     <color name="jv_bottom_nav_background">#FFFFFF</color>
-    <color name="jv_bottom_nav_item">#0B132B</color>
+    <!-- Inactive tab color. The active tab uses jv_orange via the
+         res/color/jv_bottom_nav_item.xml selector. -->
+    <color name="jv_bottom_nav_item_inactive">#0B132B</color>
     <!-- rating circles -->
     <color name="jv_rating_empty">#D6D6D6</color>
 </resources>

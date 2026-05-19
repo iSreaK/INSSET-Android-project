@@ -11,6 +11,6 @@
     <color name="jv_card_background">#15203E</color>
     <color name="jv_text_on_card">#FFFFFF</color>
     <color name="jv_bottom_nav_background">#0B132B</color>
-    <color name="jv_bottom_nav_item">#FFFFFF</color>
+    <color name="jv_bottom_nav_item_inactive">#FFFFFF</color>
     <color name="jv_rating_empty">#3A4565</color>
 </resources>

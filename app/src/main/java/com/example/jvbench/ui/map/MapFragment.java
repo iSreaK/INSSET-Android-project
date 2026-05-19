@@ -28,6 +28,7 @@ import com.bumptech.glide.Glide;
 import com.example.jvbench.R;
 import com.example.jvbench.core.map.MapMarker;
 import com.example.jvbench.core.map.MapService;
+import com.example.jvbench.core.navigation.BottomNavBinder;
 import com.example.jvbench.core.navigation.NavConstants;
 import com.example.jvbench.core.network.NetworkMonitor;
 import com.example.jvbench.core.theme.WindowInsetsHelper;
@@ -188,30 +189,7 @@ public class MapFragment extends Fragment {
         bottomNavCache = bottomNavigationView;
         WindowInsetsHelper.addBottomSystemInset(bottomNavigationView);
         boolean isAdminUser = currentUser != null && currentUser.getRole().isAdmin();
-        bottomNavigationView.getMenu().findItem(R.id.navAdminItem).setVisible(isAdminUser);
-        bottomNavigationView.setOnItemSelectedListener(item -> {
-            int id = item.getItemId();
-            if (id == R.id.navMapItem) {
-                return true;
-            }
-            if (id == R.id.navAccountItem) {
-                NavHostFragment.findNavController(this).navigate(R.id.action_mapFragment_to_accountFragment);
-                return true;
-            }
-            if (id == R.id.navSettingsItem) {
-                NavHostFragment.findNavController(this).navigate(R.id.action_mapFragment_to_settingsFragment);
-                return true;
-            }
-            if (id == R.id.navAdminItem) {
-                NavHostFragment.findNavController(this).navigate(R.id.action_mapFragment_to_adminFragment);
-                return true;
-            }
-            return false;
-        });
-        // Synchronous so the right tab is highlighted from the very first
-        // frame; deferring with post() makes the previously-selected tab
-        // visually flicker for one frame.
-        bottomNavigationView.setSelectedItemId(R.id.navMapItem);
+        BottomNavBinder.bind(bottomNavigationView, this, R.id.navMapItem, isAdminUser);
 
         viewModel.getUiState().observe(getViewLifecycleOwner(), state -> {
             if (state == null) {
@@ -389,8 +367,10 @@ public class MapFragment extends Fragment {
                 public void onSuccess(com.example.jvbench.domain.model.User result) {
                     if (!isAdded() || bottomNavCache == null || result == null) return;
                     requireActivity().runOnUiThread(() ->
-                            bottomNavCache.getMenu().findItem(R.id.navAdminItem)
-                                    .setVisible(result.getRole().isAdmin()));
+                            BottomNavBinder.updateAdminVisibility(
+                                    bottomNavCache,
+                                    R.id.navMapItem,
+                                    result.getRole().isAdmin()));
                 }
 
                 @Override
