@@ -12,7 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.ImageButton;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -74,7 +74,7 @@ public class MapFragment extends Fragment {
     @Nullable
     private Object benchesRealtimeSub;
     @Nullable
-    private ImageButton locateMeButton;
+    private FloatingActionButton locateMeButton;
     @Nullable
     private TextView offlineBanner;
     @Nullable
@@ -242,8 +242,8 @@ public class MapFragment extends Fragment {
         boolean hasPermission = hasLocationPermission();
         locateMeButton.setEnabled(hasPermission);
         locateMeButton.setImageResource(hasPermission
-                ? R.drawable.ic_locate_me
-                : R.drawable.ic_locate_me_disabled);
+                ? R.drawable.ic_my_location
+                : R.drawable.ic_my_location_disabled);
 
         if (!hasPermission) {
             locateMeButton.setOnClickListener(v ->

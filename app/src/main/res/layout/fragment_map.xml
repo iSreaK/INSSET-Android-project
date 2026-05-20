@@ -42,24 +42,24 @@
             android:textStyle="bold"
             android:visibility="gone" />
 
-        <ImageButton
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/locateMeButton"
-            android:layout_width="52dp"
-            android:layout_height="52dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_gravity="top|end"
-            android:layout_margin="12dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
+            android:layout_marginTop="24dp"
+            android:layout_marginEnd="16dp"
             android:contentDescription="@string/locate_me"
-            android:elevation="4dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/ic_locate_me" />
+            android:src="@drawable/ic_my_location"
+            app:backgroundTint="@color/jv_orange"
+            app:tint="@color/jv_text_on_orange" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/nearbyFab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="top|end"
-            android:layout_marginTop="72dp"
+            android:layout_marginTop="96dp"
             android:layout_marginEnd="16dp"
             android:contentDescription="@string/nearby_button_label"
             android:src="@drawable/ic_nearby"
