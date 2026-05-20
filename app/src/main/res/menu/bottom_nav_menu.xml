@@ -2,10 +2,19 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/navMapItem"
-        android:icon="@android:drawable/ic_dialog_map"
+        android:icon="@drawable/ic_nav_map"
         android:title="@string/nav_map" />
     <item
         android:id="@+id/navAccountItem"
-        android:icon="@android:drawable/ic_menu_myplaces"
+        android:icon="@drawable/ic_nav_account"
         android:title="@string/nav_account" />
+    <item
+        android:id="@+id/navSettingsItem"
+        android:icon="@drawable/ic_settings"
+        android:title="@string/nav_settings" />
+    <item
+        android:id="@+id/navAdminItem"
+        android:icon="@drawable/ic_admin"
+        android:title="@string/nav_admin"
+        android:visible="false" />
 </menu>

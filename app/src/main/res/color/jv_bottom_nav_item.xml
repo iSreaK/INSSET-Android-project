@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ColorStateList for BottomNavigationView icon + label tint. Without a
+     state_checked entry, the selected tab cannot be distinguished from the
+     others, which is the root cause of the "wrong tab highlighted" bug. -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:color="@color/jv_orange"
+        android:state_checked="true" />
+    <item android:color="@color/jv_bottom_nav_item_inactive" />
+</selector>

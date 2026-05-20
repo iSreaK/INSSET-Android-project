@@ -1,72 +1,156 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/jv_light_gray"
+    android:fillViewport="true">
 
     <LinearLayout
+        android:id="@+id/benchFormContent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="24dp">
 
-        <TextView
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/bench_form_title"
-            android:textSize="24sp"
-            android:textStyle="bold" />
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
-        <EditText
-            android:id="@+id/benchNameInput"
+            <ImageButton
+                android:id="@+id/backButton"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/action_back"
+                android:src="@drawable/ic_arrow_back"
+                app:tint="@color/jv_text_on_dark" />
+
+            <TextView
+                android:id="@+id/benchFormTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="@string/create_bench_title"
+                android:textColor="@color/jv_text_on_dark"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:hint="@string/bench_name" />
+            android:hint="@string/bench_name"
+            app:boxBackgroundMode="outline"
+            app:hintTextColor="@color/jv_input_hint">
 
-        <EditText
-            android:id="@+id/benchDescriptionInput"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/benchNameInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:textColor="@color/jv_text_on_dark"
+                android:textColorHint="@color/jv_input_hint" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:hint="@string/bench_description" />
+            android:hint="@string/bench_description"
+            app:boxBackgroundMode="outline"
+            app:hintTextColor="@color/jv_input_hint">
 
-        <EditText
-            android:id="@+id/benchImageUrlInput"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:hint="@string/bench_image_url"
-            android:inputType="textUri" />
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/benchDescriptionInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textMultiLine"
+                android:minLines="2"
+                android:textColor="@color/jv_text_on_dark"
+                android:textColorHint="@color/jv_input_hint" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-        <EditText
-            android:id="@+id/benchLatitudeInput"
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:hint="@string/latitude"
-            android:inputType="numberDecimal|numberSigned" />
+            app:boxBackgroundMode="outline"
+            app:hintTextColor="@color/jv_input_hint">
 
-        <EditText
-            android:id="@+id/benchLongitudeInput"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/benchLatitudeInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal|numberSigned"
+                android:textColor="@color/jv_text_on_dark"
+                android:textColorHint="@color/jv_input_hint" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:hint="@string/longitude"
-            android:inputType="numberDecimal|numberSigned" />
+            app:boxBackgroundMode="outline"
+            app:hintTextColor="@color/jv_input_hint">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/benchLongitudeInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal|numberSigned"
+                android:textColor="@color/jv_text_on_dark"
+                android:textColorHint="@color/jv_input_hint" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <Button
+            android:id="@+id/pickImageButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:backgroundTint="@android:color/white"
+            android:text="@string/pick_image"
+            android:textColor="@color/jv_dark_blue" />
+
+        <ImageView
+            android:id="@+id/benchImagePreview"
+            android:layout_width="match_parent"
+            android:layout_height="180dp"
+            android:layout_marginTop="8dp"
+            android:contentDescription="@string/pick_image"
+            android:scaleType="centerCrop"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/useExifCoordsButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:backgroundTint="@android:color/white"
+            android:text="@string/use_photo_coords"
+            android:textColor="@color/jv_dark_blue"
+            android:visibility="gone" />
 
         <Button
             android:id="@+id/saveBenchButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="@string/save_bench" />
+            android:backgroundTint="@color/jv_orange"
+            android:text="@string/save_bench"
+            android:textColor="@color/jv_text_on_orange" />
 
         <TextView
             android:id="@+id/benchFormStatusText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:textColor="#B00020" />
+            android:textColor="@color/jv_error_red" />
 
     </LinearLayout>
 </ScrollView>

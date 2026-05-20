@@ -1,10 +1,25 @@
 <resources>
+    <!-- Light mode (default values) -->
     <color name="jv_orange">#FF5A00</color>
     <color name="jv_dark_blue">#0B132B</color>
-    <color name="jv_light_gray">#0B132B</color>
-    <color name="jv_success_green">#00E676</color>
+    <!-- screen background -->
+    <color name="jv_light_gray">#F5F5F5</color>
+    <color name="jv_success_green">#00C853</color>
     <color name="jv_text_on_orange">#FFFFFF</color>
     <color name="jv_error_red">#B00020</color>
-    <color name="jv_text_on_dark">#FFFFFF</color>
-    <color name="jv_input_hint">#B3FFFFFF</color>
+    <!-- primary text on the screen background -->
+    <color name="jv_text_on_dark">#0B132B</color>
+    <!-- hint / secondary text on the screen background -->
+    <color name="jv_input_hint">#80000000</color>
+    <!-- background for cards / info blocks -->
+    <color name="jv_card_background">#FFFFFF</color>
+    <!-- text color on top of jv_card_background -->
+    <color name="jv_text_on_card">#0B132B</color>
+    <!-- bottom navigation bar -->
+    <color name="jv_bottom_nav_background">#FFFFFF</color>
+    <!-- Inactive tab color. The active tab uses jv_orange via the
+         res/color/jv_bottom_nav_item.xml selector. -->
+    <color name="jv_bottom_nav_item_inactive">#0B132B</color>
+    <!-- rating circles -->
+    <color name="jv_rating_empty">#D6D6D6</color>
 </resources>

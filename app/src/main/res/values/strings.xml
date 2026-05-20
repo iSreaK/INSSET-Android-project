@@ -16,19 +16,34 @@
 
     <string name="add_bench">Ajouter un banc</string>
     <string name="bench_form_title">Nouveau banc</string>
+    <string name="create_bench_title">Nouveau banc</string>
+    <string name="edit_bench_title">Modifier le banc</string>
     <string name="bench_name">Nom du banc</string>
-    <string name="bench_description">Description</string>
+    <string name="bench_description">Description (facultatif)</string>
     <string name="bench_image_url">Image URL</string>
+    <string name="pick_image">Choisir une image</string>
+    <string name="use_photo_coords">Utiliser les coordonnees de la photo</string>
+    <string name="exif_coords_filled">Coordonnees lues depuis la photo.</string>
     <string name="latitude">Latitude</string>
     <string name="longitude">Longitude</string>
     <string name="save_bench">Enregistrer le banc</string>
+    <string name="action_edit">Modifier</string>
+    <string name="action_delete">Supprimer</string>
+    <string name="confirm_delete_title">Supprimer ce banc ?</string>
+    <string name="confirm_delete_message">Cette action est irreversible.</string>
+    <string name="my_benches_title">Mes bancs</string>
+    <string name="my_benches_empty">Vous n avez pas encore ajoute de banc.</string>
+    <string name="error_image_upload">Erreur lors de l upload de l image.</string>
+    <string name="error_image_read">Impossible de lire l image selectionnee.</string>
     <string name="add_review">Ajouter un avis</string>
+    <string name="edit_my_review">Modifier votre avis</string>
     <string name="rating_out_of_10">Note (0-10)</string>
     <string name="review_comment">Commentaire</string>
     <string name="save_review">Enregistrer un avis</string>
 
     <string name="loading">Chargement...</string>
     <string name="map_ready">Carte prete. %1$d banc(s).</string>
+    <string name="error_map_load">Impossible de charger les bancs. Verifie ta connexion.</string>
     <string name="coordinates_format">Lat: %1$.5f, Lng: %2$.5f</string>
     <string name="bench_meta_format">Note: %1$.1f/10 (%2$d avis)</string>
 
@@ -38,7 +53,7 @@
     <string name="error_invalid_username">Le username doit contenir 3 a 20 caracteres (lettres, chiffres, underscore).</string>
     <string name="error_password_too_short">Le mot de passe doit contenir au moins 6 caracteres.</string>
     <string name="error_password_mismatch">Les mots de passe ne correspondent pas.</string>
-    <string name="error_missing_bench_fields">Veuillez completer les champs requis du banc.</string>
+    <string name="error_missing_bench_fields">Le nom et les coordonnees sont obligatoires.</string>
     <string name="error_invalid_coordinates">Les coordonnees sont invalides.</string>
     <string name="error_missing_bench_id">Identifiant du banc manquant.</string>
     <string name="error_bench_not_found">Banc introuvable.</string>
@@ -49,6 +64,59 @@
 
     <string name="nav_map">Carte</string>
     <string name="nav_account">Compte</string>
+    <string name="nav_settings">Reglages</string>
+    <string name="nav_admin">Admin</string>
+
+    <string name="admin_title">Gestion des utilisateurs</string>
+    <string name="admin_no_users">Aucun utilisateur.</string>
+    <string name="admin_set_moderator">Promouvoir moderateur</string>
+    <string name="admin_set_user">Retrograder en utilisateur</string>
+    <string name="admin_confirm_delete_title">Supprimer cet utilisateur ?</string>
+    <string name="admin_confirm_delete_message">Le compte de %1$s, ses bancs et ses avis seront definitivement supprimes.</string>
+
+    <string name="action_back">Retour</string>
+    <string name="settings_dark_mode">Mode sombre</string>
+    <string name="settings_dark_mode_subtitle">Activer le theme sombre de l application</string>
+
+    <string name="bench_author_format">Ajoute par : %1$s</string>
+    <string name="action_view_more">Voir plus</string>
+    <string name="locate_me">Me localiser</string>
+    <string name="locate_me_waiting">Recherche de votre position...</string>
+    <string name="location_disabled_hint">Localisation desactivee. Active la dans les reglages Android.</string>
+    <string name="map_long_press_hint">Maintiens un appui sur la carte pour ajouter un banc.</string>
+    <string name="offline_banner">Hors ligne — certaines actions sont indisponibles.</string>
+    <string name="offline_action_blocked">Action indisponible hors ligne.</string>
+    <string name="nearby_title">Bancs autour de vous</string>
+    <string name="nearby_radius_label">Rayon de recherche : %1$d m</string>
+    <string name="nearby_empty">Aucun banc dans ce rayon.</string>
+    <string name="nearby_no_fix">Position inconnue. Active la localisation pour voir les bancs autour.</string>
+    <string name="nearby_distance_meters">À %1$d m</string>
+    <string name="nearby_distance_kilometers">À %1$.1f km</string>
+    <string name="nearby_navigate">S y rendre</string>
+    <string name="nearby_open">Voir le banc</string>
+    <string name="error_no_navigation_app">Aucune application de navigation installee.</string>
+    <string name="nearby_button_label">Autour de vous</string>
+    <string name="nearby_button_disabled_offline">Hors ligne — recherche indisponible.</string>
+    <string name="nearby_button_disabled_no_perm">Active la localisation pour rechercher autour de toi.</string>
+
+    <string name="channel_navigation_name">Navigation vers un banc</string>
+    <string name="channel_navigation_desc">Notification persistante affichee pendant la marche vers un banc.</string>
+    <string name="channel_arrival_name">Arrivee a un banc</string>
+    <string name="channel_arrival_desc">Alertes quand vous arrivez pres d un banc cible.</string>
+    <string name="notif_navigation_title">Navigation jv-Bench</string>
+    <string name="notif_navigation_text">En route vers : %1$s</string>
+    <string name="notif_arrival_title">Vous etes arrive a : %1$s</string>
+    <string name="notif_arrival_text">N oubliez pas de laisser un avis.</string>
+
+    <string name="reviews_section_title">Avis</string>
+    <string name="reviews_empty">Aucun avis pour le moment.</string>
+    <string name="review_rating_format">Note : %1$d/10</string>
+    <string name="review_rating_short_format">%1$d/10</string>
+    <string name="review_unknown_author">Anonyme</string>
+    <string name="bench_rating_big_format">%1$.1f/10</string>
+    <string name="edit_review_title">Modifier mon avis</string>
+    <string name="delete_review">Supprimer mon avis</string>
+    <string name="confirm_delete_review_title">Supprimer cet avis ?</string>
 
     <string name="account_not_connected">Aucun compte connecte.</string>
     <string name="account_connected">Compte connecte.</string>

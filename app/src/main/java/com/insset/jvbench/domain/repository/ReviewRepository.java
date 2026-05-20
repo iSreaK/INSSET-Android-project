@@ -1,0 +1,18 @@
+package com.insset.jvbench.domain.repository;
+
+import com.insset.jvbench.core.common.ResultCallback;
+import com.insset.jvbench.domain.model.Review;
+
+import java.util.List;
+
+public interface ReviewRepository {
+    void getReviewsForBench(String benchId, ResultCallback<List<Review>> callback);
+
+    void getReviewByUserAndBench(String userId, String benchId, ResultCallback<Review> callback);
+
+    void addReview(Review review, ResultCallback<Void> callback);
+
+    void updateReview(Review review, ResultCallback<Void> callback);
+
+    void deleteReview(String reviewId, ResultCallback<Void> callback);
+}
