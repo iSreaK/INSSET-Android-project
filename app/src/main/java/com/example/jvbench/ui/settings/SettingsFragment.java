@@ -10,11 +10,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.jvbench.R;
-import com.example.jvbench.core.navigation.BottomNavBinder;
 import com.example.jvbench.core.theme.ThemePreferences;
-import com.example.jvbench.core.theme.WindowInsetsHelper;
 import com.example.jvbench.di.App;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.materialswitch.MaterialSwitch;
 
 public class SettingsFragment extends Fragment {
@@ -44,10 +41,5 @@ public class SettingsFragment extends Fragment {
             requireActivity().recreate();
         });
 
-        BottomNavigationView bottomNavigationView = view.findViewById(R.id.settingsBottomNav);
-        WindowInsetsHelper.addBottomSystemInset(bottomNavigationView);
-        com.example.jvbench.domain.model.User u = app.getAppContainer().authRepository.getCurrentUser();
-        boolean isAdmin = u != null && u.getRole().isAdmin();
-        BottomNavBinder.bind(bottomNavigationView, this, R.id.navSettingsItem, isAdmin);
     }
 }

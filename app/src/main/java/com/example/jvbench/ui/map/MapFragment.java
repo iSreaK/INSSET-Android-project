@@ -28,17 +28,14 @@ import com.bumptech.glide.Glide;
 import com.example.jvbench.R;
 import com.example.jvbench.core.map.MapMarker;
 import com.example.jvbench.core.map.MapService;
-import com.example.jvbench.core.navigation.BottomNavBinder;
 import com.example.jvbench.core.navigation.NavConstants;
 import com.example.jvbench.core.network.NetworkMonitor;
-import com.example.jvbench.core.theme.WindowInsetsHelper;
 import com.example.jvbench.data.remote.supabase.SupabaseRealtimeClient;
 import com.example.jvbench.di.App;
 import com.example.jvbench.domain.model.Bench;
 import com.example.jvbench.domain.model.GeoPoint;
 import com.example.jvbench.domain.model.User;
 import com.example.jvbench.ui.main.AppViewModelFactory;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -65,8 +62,6 @@ public class MapFragment extends Fragment {
     private MapViewModel viewModel;
     private boolean loggedIn;
 
-    @Nullable
-    private BottomNavigationView bottomNavCache;
     @Nullable
     private App appCache;
     @Nullable
@@ -184,12 +179,6 @@ public class MapFragment extends Fragment {
             NavHostFragment.findNavController(this)
                     .navigate(R.id.action_mapFragment_to_nearbyBenchesFragment);
         });
-
-        BottomNavigationView bottomNavigationView = view.findViewById(R.id.mapBottomNav);
-        bottomNavCache = bottomNavigationView;
-        WindowInsetsHelper.addBottomSystemInset(bottomNavigationView);
-        boolean isAdminUser = currentUser != null && currentUser.getRole().isAdmin();
-        BottomNavBinder.bind(bottomNavigationView, this, R.id.navMapItem, isAdminUser);
 
         viewModel.getUiState().observe(getViewLifecycleOwner(), state -> {
             if (state == null) {
@@ -356,26 +345,6 @@ public class MapFragment extends Fragment {
         if (networkMonitor != null && networkListener == null) {
             networkListener = this::applyOnlineState;
             networkMonitor.addListener(networkListener);
-        }
-
-        // Cold-start case: getCurrentUser() may have returned a USER-role
-        // fallback while loadCurrentUser was still in-flight. Refresh the
-        // admin tab visibility once the real profile lands.
-        if (appCache != null) {
-            appCache.getAppContainer().authRepository.loadCurrentUser(new com.example.jvbench.core.common.ResultCallback<com.example.jvbench.domain.model.User>() {
-                @Override
-                public void onSuccess(com.example.jvbench.domain.model.User result) {
-                    if (!isAdded() || bottomNavCache == null || result == null) return;
-                    requireActivity().runOnUiThread(() ->
-                            BottomNavBinder.updateAdminVisibility(
-                                    bottomNavCache,
-                                    R.id.navMapItem,
-                                    result.getRole().isAdmin()));
-                }
-
-                @Override
-                public void onError(String errorMessage) { /* keep last known */ }
-            });
         }
     }
 

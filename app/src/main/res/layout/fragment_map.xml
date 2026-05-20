@@ -7,8 +7,7 @@
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_height="match_parent">
 
         <!-- Provider-agnostic container: the MapService implementation
              inflates its own native view (osmdroid MapView, GoogleMap
@@ -153,14 +152,5 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
     </FrameLayout>
-
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/mapBottomNav"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/jv_bottom_nav_background"
-        app:itemIconTint="@color/jv_bottom_nav_item"
-        app:itemTextColor="@color/jv_bottom_nav_item"
-        app:menu="@menu/bottom_nav_menu" />
 
 </LinearLayout>
