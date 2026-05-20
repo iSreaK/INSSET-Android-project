@@ -71,20 +71,20 @@ Le projet suit le pattern **MVVM** (Model-View-ViewModel) combiné au **Reposito
 
 ## Choix techniques
 
-| Domaine | Choix | Justification |
-|---|---|---|
-| Langage | **Java 17** | Maîtrise commune de l'équipe ; perte assumée des 2 points bonus Kotlin |
-| Build | Gradle (Groovy DSL), AGP 8.5.2, compileSdk 35, minSdk 24 | Versions modernes, supporte Android 7+ |
-| UI | Fragments + XML, Material3 | Single-activity + Navigation Component |
-| Navigation | `androidx.navigation` 2.8.2 | `nav_graph.xml` centralisé, arguments typés |
-| Carte | **osmdroid** 6.1.20 + osmbonuspack 6.9.0 | Gratuit, données OpenStreetMap, clustering inclus |
-| Géolocalisation | `FusedLocationProviderClient` (Play Services) | Compromis précision/batterie optimal |
-| Réseau | **OkHttp** 4.12.0 + `org.json` | REST direct, pas de SDK propriétaire à arracher en cas de changement de backend |
-| Realtime | WebSocket OkHttp + protocole Phoenix Channels Supabase | Push instantané des changements sur les bancs |
-| Backend | **Supabase** (Postgres + REST + Auth + Storage + Realtime + RLS) | Open source, RLS native, scalable |
-| Images | Glide 4.16 + AndroidX ExifInterface 1.4 | Cache mémoire/disque automatique, lecture EXIF GPS |
-| Concurrence | `ExecutorService` + `ResultCallback<T>` | Simple, explicite, pas de dépendance externe |
-| DI | Manuelle (`AppContainer`) | Composition root unique, zéro magie, idéale pour 4 développeurs |
+| Domaine | Choix | 
+|---|---|
+| Langage | **Java 17** |
+| Build | Gradle (Groovy DSL), AGP 8.5.2, compileSdk 35, minSdk 24 |
+| UI | Fragments + XML, Material3 |
+| Navigation | `androidx.navigation` 2.8.2 |
+| Carte | **osmdroid** 6.1.20 + osmbonuspack 6.9.0 |
+| Géolocalisation | `FusedLocationProviderClient` (Play Services) |
+| Réseau | **OkHttp** 4.12.0 + `org.json` | 
+| Realtime | WebSocket OkHttp + protocole Phoenix Channels Supabase | 
+| Backend | **Supabase** (Postgres + REST + Auth + Storage + Realtime + RLS) |
+| Images | Glide 4.16 + AndroidX ExifInterface 1.4 |
+| Concurrence | `ExecutorService` + `ResultCallback<T>` |
+| DI | Manuelle (`AppContainer`) |
 
 ---
 
