@@ -68,5 +68,4 @@ Important:
 ## Notes
 - Ce repo reste evolutif: certaines parties sont deja utilisables, d'autres sont encore en implementation.
 
-Si tu veux, je peux te le faire en format 'pret a publier', ca sera encore plus proper
 
