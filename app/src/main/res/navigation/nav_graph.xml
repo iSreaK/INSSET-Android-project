@@ -6,7 +6,7 @@
 
     <fragment
         android:id="@+id/loginFragment"
-        android:name="com.example.jvbench.ui.auth.LoginFragment"
+        android:name="com.insset.jvbench.ui.auth.LoginFragment"
         android:label="Login">
         <action
             android:id="@+id/action_loginFragment_to_registerFragment"
@@ -21,7 +21,7 @@
 
     <fragment
         android:id="@+id/registerFragment"
-        android:name="com.example.jvbench.ui.auth.RegisterFragment"
+        android:name="com.insset.jvbench.ui.auth.RegisterFragment"
         android:label="Register">
         <action
             android:id="@+id/action_registerFragment_to_mapFragment"
@@ -33,7 +33,7 @@
 
     <fragment
         android:id="@+id/mapFragment"
-        android:name="com.example.jvbench.ui.map.MapFragment"
+        android:name="com.insset.jvbench.ui.map.MapFragment"
         android:label="Map">
         <action
             android:id="@+id/action_mapFragment_to_loginFragment"
@@ -60,7 +60,7 @@
 
     <fragment
         android:id="@+id/accountFragment"
-        android:name="com.example.jvbench.ui.account.AccountFragment"
+        android:name="com.insset.jvbench.ui.account.AccountFragment"
         android:label="Compte">
         <action
             android:id="@+id/action_accountFragment_to_mapFragment"
@@ -84,7 +84,7 @@
 
     <fragment
         android:id="@+id/settingsFragment"
-        android:name="com.example.jvbench.ui.settings.SettingsFragment"
+        android:name="com.insset.jvbench.ui.settings.SettingsFragment"
         android:label="Settings">
         <action
             android:id="@+id/action_settingsFragment_to_mapFragment"
@@ -99,7 +99,7 @@
 
     <fragment
         android:id="@+id/adminFragment"
-        android:name="com.example.jvbench.ui.admin.AdminFragment"
+        android:name="com.insset.jvbench.ui.admin.AdminFragment"
         android:label="Admin">
         <action
             android:id="@+id/action_adminFragment_to_mapFragment"
@@ -114,7 +114,7 @@
 
     <fragment
         android:id="@+id/benchFormFragment"
-        android:name="com.example.jvbench.ui.benchform.BenchFormFragment"
+        android:name="com.insset.jvbench.ui.benchform.BenchFormFragment"
         android:label="Bench form">
         <argument
             android:name="benchId"
@@ -133,7 +133,7 @@
 
     <fragment
         android:id="@+id/benchDetailFragment"
-        android:name="com.example.jvbench.ui.benchdetail.BenchDetailFragment"
+        android:name="com.insset.jvbench.ui.benchdetail.BenchDetailFragment"
         android:label="Bench detail">
         <action
             android:id="@+id/action_benchDetailFragment_to_reviewFormFragment"
@@ -148,7 +148,7 @@
 
     <fragment
         android:id="@+id/myBenchesFragment"
-        android:name="com.example.jvbench.ui.mybenches.MyBenchesFragment"
+        android:name="com.insset.jvbench.ui.mybenches.MyBenchesFragment"
         android:label="Mes bancs">
         <action
             android:id="@+id/action_myBenchesFragment_to_benchDetailFragment"
@@ -157,7 +157,7 @@
 
     <fragment
         android:id="@+id/reviewFormFragment"
-        android:name="com.example.jvbench.ui.reviewform.ReviewFormFragment"
+        android:name="com.insset.jvbench.ui.reviewform.ReviewFormFragment"
         android:label="Review form">
         <argument
             android:name="benchId"
@@ -166,7 +166,7 @@
 
     <fragment
         android:id="@+id/nearbyBenchesFragment"
-        android:name="com.example.jvbench.ui.nearby.NearbyBenchesFragment"
+        android:name="com.insset.jvbench.ui.nearby.NearbyBenchesFragment"
         android:label="Bancs autour de vous">
         <action
             android:id="@+id/action_nearbyBenchesFragment_to_benchDetailFragment"

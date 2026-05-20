@@ -33,7 +33,7 @@
             android:name=".core.geofence.GeofenceTransitionReceiver"
             android:exported="false">
             <intent-filter>
-                <action android:name="com.example.jvbench.action.GEOFENCE_EVENT" />
+                <action android:name="com.insset.jvbench.action.GEOFENCE_EVENT" />
             </intent-filter>
         </receiver>
 

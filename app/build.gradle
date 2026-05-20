@@ -6,11 +6,11 @@ def supabaseUrl = project.findProperty("SUPABASE_URL") ?: "TODO_SUPABASE_URL"
 def supabaseAnonKey = project.findProperty("SUPABASE_ANON_KEY") ?: "TODO_SUPABASE_ANON_KEY"
 
 android {
-    namespace 'com.example.jvbench'
+    namespace 'com.insset.jvbench'
     compileSdk 35
 
     defaultConfig {
-        applicationId "com.example.jvbench"
+        applicationId "com.insset.jvbench"
         minSdk 24
         targetSdk 35
         versionCode 1
