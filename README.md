@@ -97,8 +97,4 @@ Le projet suit le pattern **MVVM** (Model-View-ViewModel) combiné au **Reposito
 | **Kerrian** | CRUD Bancs · Upload image · EXIF GPS · Supabase Storage |
 | **Lilian** | Détail banc · Avis · Notation · Moyenne · `review_count` |
 
----
 
-## Licence
-
-Projet académique réalisé dans le cadre du module Développement Mobile Android — Master CCM-M1, INSSET — 2025-2026.
